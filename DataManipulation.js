@@ -140,16 +140,16 @@ export let mapFFTData = (fft,fft_timestamp, bands, coord) => {
 //The coherence map is formatted in an order so that the output order of our coherence algorithm 
 // corresponds to the order of the coherence map indices. So it can just be mapped onto it. 
 export let mapCoherenceData = (coherence_output, coherence_timestamp, bands, coherenceMap) => {
-    coherence_output.forEach(row,i => {
+    coherence_output.forEach((row,i) => {
         coherenceMap[i].fftCount++;
         coherenceMap[i].fftTimes.push(coherence_timestamp);
         coherenceMap[i].ffts.push(data);
-        let i = 0;
+        let j = 0;
         for(const prop in bands) { //assume the band properties are in the same order as the fft array (0Hz to 256Hz or whatever the upper limit is)
-            let slice = fft.slice(i,i+bands[prop][1].length);
+            let slice = fft.slice(j,j+bands[prop][1].length);
             coord.slices[prop].push(slice);
             coord.means[prop].push(slice.reduce((a,b)=>a+b)/slice.length);
-            i += bands[prop][1].length;
+            j += bands[prop][1].length;
         }
     });
 }

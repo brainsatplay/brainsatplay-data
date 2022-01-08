@@ -1,6 +1,6 @@
 {
     "name": "brainsatplay-data",
-    "version": "0.0.4",
+    "version": "0.0.8",
     "description": "Data Structures plus some useful classes for data manipulation",
     "main": "index.js",
     "scripts": {
@@ -18,8 +18,8 @@
     "author": "Joshua Brewster and Garrett Flynn",
     "license": "AGPL-3.0-or-later",
     "dependencies": {
-      "magicworker": "^1.0.4",
-      "brainsatplay-math": "^0.0.1"
+      "magicworker": "^1.0.5",
+      "brainsatplay-math": "^0.0.2"
     },
     "bugs": {
       "url": "https://github.com/brainsatplay/DataStructures/issues"
