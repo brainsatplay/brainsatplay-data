@@ -29,6 +29,8 @@ export class DataTablet {
             fnirs:{}
         }
 
+        this.rolloverLimit = 50000;
+
         Object.assign(this.data,props);
 
         this.dataSorts = new Map(); //what to do with data based on struct or data type
@@ -425,5 +427,35 @@ export class DataTablet {
     
         return ordered;
     }
+
+    //cuts array sizes to the set limit
+    checkRollover(collection, limit=this.rolloverLimit) { //'eeg','heg', etc
+		if(!collection) return false;
+
+        let c = this.collections.get(collection);
+        if(!c) return false;
+
+        c.forEach((struct) => {
+            for(const prop in struct) {
+                if(Array.isArray(struct[prop])) {
+                    if(struct[prop].length > limit)  {
+                        struct[prop].slice(struct[prop].length-limit);
+                        if(prop === 'ffts') { //adjust counters
+                            struct.fftCount = struct[prop].length;
+                            struct.lastReadFFT = struct[prop].length;
+                        }
+                        else if (prop === 'times') {
+                            struct.count = struct[prop].length;
+                            struct.lastRead = struct[prop].length;
+                        }
+                    }
+                } else if (typeof struct[prop] === 'object') {
+                    this.checkRollover(struct[prop]);
+                }
+            }
+        });
+
+	}
+
 
 }
