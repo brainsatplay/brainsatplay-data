@@ -1,4 +1,4 @@
-import { Math2 } from "../Math2"
+import { Math2 } from "brainsatplay-math"
 
 //Manipulation of biodata from structs in DataStructures.js
 
