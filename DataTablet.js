@@ -13,6 +13,8 @@ export class DataTablet {
             this.threaded = 2;
         }
 
+        this.collections = new Map();
+
         this.data = {
             byTime:{}, //everything is arranged by time
             notes:{},
@@ -75,12 +77,97 @@ export class DataTablet {
         return `${tag+Math.floor(Math.random()+Math.random()*Math.random()*10000000000000000)}`;
     }
 
-    dynamicImport = async (url) => {
+    setLocalData (structs) {
 
-        let getImportFunc = `async (url) => {return await import(url)}`
-        let getImport = eval(`(${getImportFunc})`);
-        let module = await getImport(url)
-        return module;
+        let setInCollection = (s) => {
+            let type = s.structType;
+        
+            let collection = this.collections.get(type);
+            if(!collection) {
+                collection = new Map();
+                this.collections.set(type,collection);
+            }
+            collection.set(s._id,s);
+            this.onCollectionSet(type,collection);
+        }
+
+        if(Array.isArray(structs)) {
+            structs.forEach((s)=>{
+                setInCollection(s)
+            });
+        }
+        else setInCollection(structs)
+    }
+
+    //pull a struct by collection, owner, and key/value pair from the local platform, leave collection blank to pull all ownerId associated data
+    getLocalData(collection, query) {
+
+        // Split Query
+        let ownerId, key, value;
+        if (typeof query === 'object'){
+            ownerId = query.ownerId
+            // TODO: Make more robust. Does not support more than one key (aside from ownerId)
+            const keys = Object.keys(query).filter(k => k != 'ownerId')
+            key = keys[0]
+            value = query[key]
+        } else value = query
+        
+        if (!collection && !ownerId && !key && !value) return [];
+
+        let result = [];
+        if(!collection && (ownerId || key)) {
+            this.collections.forEach((c) => { //search all collections
+                if((key === '_id' || key === 'id') && value) {
+                    let found = c.get(value);
+                    if(found) result.push(found);
+                }
+                else {
+                    c.forEach((struct) => {
+                        if(key && value) {
+                            if(struct[key] === value && struct.ownerId === ownerId) {
+                                result.push(struct);
+                            }
+                        }
+                        else if(struct.ownerId === ownerId) {
+                            result.push(struct);
+                        }
+                    });
+                }
+            });
+            return result;
+        }
+        else {
+            let c = this.collections.get(collection);
+            if(!c) return result; 
+
+            if(!key && !ownerId) {
+                c.forEach((struct) => {result.push(struct);})
+                return result; //return the whole collection
+            }
+            
+            if((key === '_id' || key === 'id') && value) return c.get(value); //collections store structs by id so just get the one struct
+            else {
+                c.forEach((struct,k) => {
+                    if(key && value && !ownerId) {
+                        if(struct[key] === value) result.push(struct);
+                    }   
+                    else if(ownerId && !key) {
+                        if(struct.ownerId === ownerId) result.push(struct);
+                    } 
+                    else if (ownerId && key && value) {
+                        if(struct.ownerId === ownerId && struct[key]) {
+                            if(struct[key] === value) result.push(struct);
+                        }
+                    }
+                });
+            }
+        }
+        return result;                            //return an array of results
+    }
+
+    //customize what to do with the updated collection after setting
+    onCollectionSet = (typ,collection) => {
+    
     }
 
     runSort(key,dataObj={},newdata=[],tablet=this) {
