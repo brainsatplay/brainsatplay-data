@@ -1,5 +1,5 @@
-import WorkerManager from 'magicworker'
-import DataTablet from './DataTablet.js'
+import {WorkerManager} from 'magicworker'
+import {DataTablet} from './DataTablet.js'
 
 //Creates a thread that can be used for caching data and performing operations on it without issues on the main thread.
 //This will need extensive testing

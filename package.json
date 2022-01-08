@@ -1,6 +1,6 @@
 {
     "name": "brainsatplay-data",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "description": "Data Structures plus some useful classes for data manipulation",
     "main": "index.js",
     "scripts": {
