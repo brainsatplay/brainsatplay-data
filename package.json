@@ -1,0 +1,28 @@
+{
+    "name": "brainsatplay-data",
+    "version": "0.0.1",
+    "description": "Data Structures plus some useful classes for data manipulation",
+    "main": "index.js",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+      "type": "git",
+      "url": "git+https://github.com/brainsatplay/DataStructures.git"
+    },
+    "keywords": [
+      "datastructures",
+      "data",
+      "brainsatplay"
+    ],
+    "author": "Joshua Brewster and Garrett Flynn",
+    "license": "AGPL-3.0-or-later",
+    "dependencies": {
+      "magicworker": "^1.0.3"
+    },
+    "bugs": {
+      "url": "https://github.com/brainsatplay/DataStructures/issues"
+    },
+    "homepage": "https://github.com/brainsatplay/DataStructures#readme"
+  }
+  
