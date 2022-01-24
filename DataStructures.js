@@ -172,8 +172,6 @@ export function EEGStruct(
         ffts:[], 
         slices:JSON.parse(JSON.stringify(bands)), 
         means:JSON.parse(JSON.stringify(bands)),
-        lastReadFFT:0, // counter value when this struct was last read from (using get functions)
-        lastRead:0,
         startTime:Date.now()
     };
 
@@ -203,7 +201,6 @@ export function CoherenceStruct(
         ffts:[],
         slices: JSON.parse(JSON.stringify(bands)),
         means: JSON.parse(JSON.stringify(bands)),  // counter value when this struct was last read from (for using get functions)
-        lastRead:0,
         startTime:Date.now()
     };
 
@@ -272,7 +269,6 @@ export function FNIRSStruct(
             val_dists2:[],
             peak_dists2:[]
         },
-        lastRead:0, 
         startTime:Date.now()
     };
 
@@ -298,7 +294,6 @@ export function IMUStruct(
         Gx:[],
         Gy:[],
         Gz:[],
-        lastRead:0, 
         startTime:Date.now()
     };
 
@@ -323,7 +318,6 @@ export function EyeTrackerStruct(
         y:[], 
         smax:[],  //simple moving averages
         smay:[], 
-        lastRead:0, 
         startTime:Date.now()
     };
     
@@ -349,7 +343,6 @@ export function ECGStruct(
         filtered:[],
         bpm:[],
         hrv:[],
-        lastRead:0,
         startTime:Date.now()
     };
     
