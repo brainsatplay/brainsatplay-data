@@ -6,8 +6,7 @@ import {DataTablet} from './DataTablet.js'
 export class DataThread {
     constructor(workermanager, workerId) {
         if(!workermanager) {
-            if(!window.workers)
-                window.workers = new WorkerManager();
+            this.workers = new WorkerManager();
 
             this.workers = window.workers;
         } else this.workers = workermanager;
@@ -38,16 +37,16 @@ export class DataThread {
                     });
                 }    
             },
-            origin,
-            this.workerId
+            this.workerId,
+            this.origin
         );
 
 
         this.workers.runWorkerFunction(
             'transferClassObject',
             {tabletClass:DataTablet.toString()},
-            this.id,
-            workerId
+            this.workerId,
+            this.origin
         );
 
         this.workers.addWorkerFunction(
@@ -60,8 +59,8 @@ export class DataThread {
                 }
                 return true;
             },
-            origin,
-            this.workerId
+            this.workerId,
+            this.origin
         );
 
         this.workers.addWorkerFunction(
@@ -76,8 +75,8 @@ export class DataThread {
                 }
                 return true;
             },
-            origin,
-            this.workerId
+            this.workerId,
+            this.origin
         );
 
         this.workers.addWorkerFunction(
@@ -86,8 +85,8 @@ export class DataThread {
                 self.tablet.setSort(...args);
                 return true;
             },
-            origin,
-            this.workerId
+            this.workerId,
+            this.origin
         );
 
         this.workers.addWorkerFunction(
@@ -103,8 +102,8 @@ export class DataThread {
                     return results;
                 } 
             },
-            origin,
-            this.workerId
+            this.workerId,
+            this.origin
         );
 
         this.workers.addWorkerFunction(
@@ -112,8 +111,8 @@ export class DataThread {
             (self,args,origin) => {
                 return self.tablet.getDataByTimeRange(...args);
             },
-            origin,
-            this.workerId
+            this.workerId,
+            this.origin
         );
 
         this.workers.addWorkerFunction(
@@ -121,15 +120,15 @@ export class DataThread {
             (self,args,origin) => {
                 return self.tablet.getDataByTimestamp(...args);
             },
-            origin,
-            this.workerId
+            this.workerId,
+            this.origin
         );
 
         this.workers.runWorkerFunction(
             'makeTablet', 
             props, 
-            this.id, 
-            this.workerId
+            this.workerId,
+            this.origin
         );
     }
 
@@ -139,7 +138,7 @@ export class DataThread {
                 data[prop] = Float32Array.from(data[prop]);
             }
         }
-        this.workers.runWorkerFunction('setValuesFromArrayBuffers',data,this.id,this.workerId);
+        this.workers.runWorkerFunction('setValuesFromArrayBuffers',data,this.workerId,this.id);
     }
 
     transferAndAppendArrays(data={}) {
@@ -148,7 +147,7 @@ export class DataThread {
                 data[prop] = Float32Array.from(data[prop]); //converts any arrays to arraybuffers for transfer, they are then deconverted
             }
         }
-        this.workers.runWorkerFunction('appendValuesFromArrayBuffers',data,this.id,this.workerId);
+        this.workers.runWorkerFunction('appendValuesFromArrayBuffers',data,this.workerId,this.id);
     }
 
 

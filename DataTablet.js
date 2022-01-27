@@ -4,12 +4,12 @@ export class DataTablet {
     constructor(
         props={},
         threaded=false, // Use this with the DataThread class
-        workermanager=undefined, 
-        workerId=undefined) 
-    {
+        magicworker=undefined
+    ) {
 
         this.threaded = threaded;
-        if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
+        if(magicworker) this.workers=magicworker;
+        else if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
             this.threaded = 2;
         }
 
@@ -70,8 +70,6 @@ export class DataTablet {
         //this.setSort();
 
         this.id = this.randomId('dataTablet');
-        this.workers = workermanager;
-        this.workerId = workerId;
 
     }
 
@@ -179,7 +177,7 @@ export class DataTablet {
             if(sort) result = sort(dataObj,newdata,tablet);
             else return false;
         } else if (this.threaded === true) {
-            this.workers.runWorkerFunction('runSort',[key,dataObj,newdata],this.id,this.workerId);
+            this.workers.runWorkerFunction('runSort',[key,dataObj,newdata],this.workerId,this.id);
         }
     }
 
@@ -190,7 +188,7 @@ export class DataTablet {
             else
                 this.dataSorts.set(key,response);
         } else if (this.threaded === true) {
-            this.workers.runWorkerFunction('setSort',[key,response.toString()],this.id,this.workerId);
+            this.workers.runWorkerFunction('setSort',[key,response.toString()],this.workerId,this.id);
         }
     }
 
@@ -198,7 +196,7 @@ export class DataTablet {
         if(this.threaded === false) {
             return this.dataSorts.get(key);
         } else if (this.threaded === true) {
-            return this.workers.runWorkerFunction('getSort',[key],this.id,this.workerId);
+            return this.workers.runWorkerFunction('getSort',[key],this.workerId,this.id);
         }
     }
 
@@ -302,7 +300,7 @@ export class DataTablet {
 
     getDataByTimestamp(timestamp,ownerId) {
         if(this.threaded === true) {
-            this.workers.runWorkerFunction('getDataByTimestamp',[timestamp,ownerId],this.id,this.workerId);
+            this.workers.runWorkerFunction('getDataByTimestamp',[timestamp,ownerId],this.workerId,this.id);
             return true;
         }
 
@@ -313,7 +311,7 @@ export class DataTablet {
 
     getDataByTimeRange(begin,end,type,ownerId) {
         if(this.threaded === true) {
-            this.workers.runWorkerFunction('getDataByTimeRange',[begin,end,type,ownerId],this.id,this.workerId);
+            this.workers.runWorkerFunction('getDataByTimeRange',[begin,end,type,ownerId],this.workerId,this.id);
             return true;
         }
 

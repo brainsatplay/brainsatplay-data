@@ -1,8 +1,9 @@
 {
     "name": "brainsatplay-data",
-    "version": "0.0.10",
+    "version": "0.0.13",
     "description": "Data Structures plus some useful classes for data manipulation",
     "main": "index.js",
+    "types": "index.d.ts",
     "type": "module",
     "scripts": {
       "test": "echo \"Error: no test specified\" && exit 1"
@@ -19,7 +20,7 @@
     "author": "Joshua Brewster and Garrett Flynn",
     "license": "AGPL-3.0-or-later",
     "dependencies": {
-      "magicworker": "^1.0.5",
+      "magicworker": "^1.0.15",
       "brainsatplay-math": "^0.0.2"
     },
     "bugs": {

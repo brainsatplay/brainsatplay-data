@@ -445,8 +445,8 @@ export function AuthorizationStruct(
         structs:          new Array(), //specific structs, contains structrefs
         excluded:         new Array(), 
         groups:           new Array(),
-        status:           'PENDING',
-        expires:          '', //PENDING for non-approved auths
+        status:           'PENDING', //PENDING for non-approved auths
+        expires:          false, 
         associatedAuthId: '' //other authorization id belonging to other user
     };
 
@@ -466,7 +466,7 @@ export function GroupStruct(
         details:"",
         admins:new Array(),
         peers:new Array(),
-        clients:new Array(), //date of expiration, or never. Data that never expires should generally only be patient controlled stuff so its transparent
+        clients:new Array(), 
         users:new Array() //all users (for notifying)   
     };
 
@@ -483,7 +483,7 @@ export function DataStruct(
     let props = {
         title:      "",
         author:     "",
-        expires:    "NEVER", //date of expiration, or never. Data that never expires should generally only be patient controlled stuff so its transparent
+        expires:    false, //date of expiration, or never. Data that never expires should generally only be patient controlled stuff so its transparent
         type:       "", //graph, file, table, fitbit_hr, fitbit_diet, etc.
         data:       new Array() //arrays, objects, links, API refrences, pdfs, csvs, xls, etc.
     };
@@ -500,14 +500,13 @@ export function EventStruct(
 ) {
     let props = {
         event:"",  //event type e.g. relapse, hospitalization
-        authorId:"", //
+        author:"", //
         startTime:"",  //event began
         endTime:"",    //event ended
         grade:"",  //severity
         notes:"", //additional details
         attachments:new Array(),
         users:new Array(), //users to be informed (i.e. peers)
-        data:new Array() //arrays of linked data
     };
 
     let struct = Struct('event',props,parentUser,parentStruct);
@@ -524,7 +523,7 @@ export function ChatroomStruct(
     let props = {
         message:'',
         topic:'',
-        authorId:'',
+        author:'',
         attachments: new Array(),
         comments: new Array(),
         replies: new Array(),
@@ -545,7 +544,7 @@ export function CommentStruct(
     additionalProps={}
 ) {
     let props = {
-        authorId:'',
+        author:'',
         replyTo:'',
         message:'',
         rating:0,
