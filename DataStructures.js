@@ -503,7 +503,7 @@ export function EventStruct(
         author:"", //
         startTime:"",  //event began
         endTime:"",    //event ended
-        grade:"",  //severity
+        grade:0,  //severity
         notes:"", //additional details
         attachments:new Array(),
         users:new Array(), //users to be informed (i.e. peers)

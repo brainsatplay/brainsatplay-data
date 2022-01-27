@@ -26,7 +26,7 @@ export type EventStruct = {
     author:string,
     startTime:string,  //event began
     endTime:string,    //event ended
-    grade:string,  //severity
+    grade:string|number,  //severity
     notes:string, //additional details
     attachments:Data|string|number[], //can be data or struct Ids
     users:string[], //users to be informed (i.e. peers)
