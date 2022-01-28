@@ -177,7 +177,7 @@ export class DataTablet {
             if(sort) result = sort(dataObj,newdata,tablet);
             else return false;
         } else if (this.threaded === true) {
-            this.workers.runWorkerFunction('runSort',[key,dataObj,newdata],this.workerId,this.id);
+            return this.workers.runWorkerFunction('runSort',[key,dataObj,newdata],this.workerId,this.id);
         }
     }
 
@@ -188,7 +188,7 @@ export class DataTablet {
             else
                 this.dataSorts.set(key,response);
         } else if (this.threaded === true) {
-            this.workers.runWorkerFunction('setSort',[key,response.toString()],this.workerId,this.id);
+            return this.workers.runWorkerFunction('setSort',[key,response.toString()],this.workerId,this.id);
         }
     }
 
@@ -300,8 +300,8 @@ export class DataTablet {
 
     getDataByTimestamp(timestamp,ownerId) {
         if(this.threaded === true) {
-            this.workers.runWorkerFunction('getDataByTimestamp',[timestamp,ownerId],this.workerId,this.id);
-            return true;
+            //if running threads this needs to be awaited or do .then(res)
+            return this.workers.runWorkerFunction('getDataByTimestamp',[timestamp,ownerId],this.workerId,this.id);
         }
 
         let result = this.data.byTime[timestamp];
@@ -311,8 +311,8 @@ export class DataTablet {
 
     getDataByTimeRange(begin,end,type,ownerId) {
         if(this.threaded === true) {
-            this.workers.runWorkerFunction('getDataByTimeRange',[begin,end,type,ownerId],this.workerId,this.id);
-            return true;
+            //if running threads this needs to be awaited or do .then(res)
+            return this.workers.runWorkerFunction('getDataByTimeRange',[begin,end,type,ownerId],this.workerId,this.id);
         }
 
         let result = {};
@@ -426,7 +426,7 @@ export class DataTablet {
         return ordered;
     }
 
-    //cuts array sizes to the set limit
+    //cuts array sizes of object properties in the collection to the set limit (holdover from DataAtlas)
     checkRollover(collection, limit=this.rolloverLimit) { //'eeg','heg', etc
 		if(!collection) return false;
 
@@ -440,11 +440,9 @@ export class DataTablet {
                         struct[prop].slice(struct[prop].length-limit);
                         if(prop === 'ffts') { //adjust counters
                             struct.fftCount = struct[prop].length;
-                            struct.lastReadFFT = struct[prop].length;
                         }
                         else if (prop === 'times') {
                             struct.count = struct[prop].length;
-                            struct.lastRead = struct[prop].length;
                         }
                     }
                 } else if (typeof struct[prop] === 'object') {

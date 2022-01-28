@@ -204,6 +204,6 @@ export type ECGStruct = {
     startTime:number|string
 } & Struct
 
-export type SPO2Struct = FNIRSStruct;
+export type PPGStruct = FNIRSStruct;
 export type HRVStruct = ECGStruct;
 export type EMGStruct = EEGStruct;

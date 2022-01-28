@@ -370,14 +370,14 @@ export function NeosensoryStruct(
 
 }
 
-export function SPO2Struct(
+export function PPGStruct(
     tag='',
     parentUser={_id:undefined},
     parentStruct={structType:undefined,_id:undefined},
     additionalProps={}
 ) { 
     let struct = FNIRSStruct(tag,parentUser,parentStruct,additionalProps);
-    struct.structType = 'spo2';
+    struct.structType = 'ppg';
     return struct;
 }
 
