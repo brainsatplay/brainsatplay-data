@@ -14,6 +14,7 @@ export type Data = {
 }
 
 export type DataStruct = {
+    tag:string,
     title:      string|undefined,
     author:     string|undefined,
     expires:    boolean|number|string, //date of expiration, or never. Data that never expires should generally only be patient controlled stuff so its transparent
@@ -22,6 +23,7 @@ export type DataStruct = {
 } & Struct
 
 export type EventStruct = {
+    tag:string,
     event:string, //event type e.g. relapse, hospitalization
     author:string,
     startTime:string,  //event began
@@ -33,6 +35,7 @@ export type EventStruct = {
 } & Struct
 
 export type ChatroomStruct = {
+    tag:string,
     message:string,
     topic:string,
     author:string,
@@ -45,6 +48,7 @@ export type ChatroomStruct = {
 } & Struct
 
 export type CommentStruct = {
+    tag:string,
     author:string,
     replyTo:string,
     attachments: Data|string|number[],
@@ -53,11 +57,13 @@ export type CommentStruct = {
 } & Struct
 
 export type NotificationStruct = {
+    tag:string,
     note:string,
     parentUserId:string
 } & Struct
 
 export type ScheduleStruct = {
+    tag:string,
     title:string,
     author:string,
     attachments: Data|string|number[],
@@ -65,6 +71,7 @@ export type ScheduleStruct = {
 } & Struct
 
 export type DateStruct = {
+    tag:string,
     timeSet:string|number,
     notes:string,
     recurs:number|string|boolean,
@@ -72,6 +79,7 @@ export type DateStruct = {
 } & Struct
 
 export type ProfileStruct = {
+    tag:string,
     username:  string,
     name?:      string, 
     firstName?: string, 
@@ -85,6 +93,7 @@ export type ProfileStruct = {
 } & Struct
 
 export type AuthorizationStruct = {
+    tag:string,
     authorizedId:     string,
     authorizedName:   string,
     authorizerId:     string,
@@ -100,6 +109,7 @@ export type AuthorizationStruct = {
 
 
 export type GroupStruct = {
+    tag:string,
     name:string,
     details:string,
     admins:string|number[], //user ids
