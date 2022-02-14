@@ -1,11 +1,11 @@
-import {WorkerManager} from 'magicworker'
+//import {WorkerManager} from 'magicworker'
 import {DataTablet} from './DataTablet.js'
 
 //Creates a thread that can be used for caching data and performing operations on it without issues on the main thread.
 //This will need extensive testing
 export class DataThread {
     constructor(workermanager, workerId) {
-        if(!workermanager) {
+        if(!workermanager && WorkerManager) {
             this.workers = new WorkerManager();
 
             this.workers = window.workers;

@@ -1,3 +1,4 @@
+import * as DS from './DataStructures'
 
 export class DataTablet {
 
@@ -12,6 +13,8 @@ export class DataTablet {
         else if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
             this.threaded = 2;
         }
+
+        this.DS = DS;
 
         this.collections = new Map();
 
@@ -34,6 +37,7 @@ export class DataTablet {
         Object.assign(this.data,props);
 
         this.dataSorts = new Map(); //what to do with data based on struct or data type
+        this.watches = {};
 
         this.setSort(
             'event',
@@ -200,19 +204,29 @@ export class DataTablet {
         }
     }
 
-    /* Barebones struct format, append any additional props */
-    Struct(additionalProps={}, structType='struct', parentStruct=undefined,parentUser=undefined) {
-        let struct = {
-            _id: this.randomId(structType+'defaultId'),   //random id associated for unique identification, used for lookup and indexing
-            structType: structType,     //this is how you will look it up by type in the server
-            ownerId: parentUser?._id,     //owner user
-            timestamp: Date.now(),      //date of creation
-            parent: {structType:parentStruct?.structType,_id:parentStruct?._id}, //parent struct it's associated with (e.g. if it needs to spawn with it)
+    checkWatches(sorted) {
+        for(const prop in this.watches) {
+            this.watches[prop].ondata(sorted, this.watches[prop].accum, this.watches[prop]);
+            if(this.watches[prop].triggered) { //manual trigger function
+                this.ontrigger(this.watches[prop].accum);
+                this.watches[prop].triggered = false;
+            }
         }
+    }
 
-        if(!parentStruct?._id) delete struct.parent;
-        if(Object.keys(additionalProps).length > 0) Object.assign(struct,additionalProps);
-        return struct;
+    //after the data is sorted these will trigger
+    setWatch(name,ondata=(struct,accum,watch)=>{},ontrigger=(data)=>{}) {
+        this.watches[name] = {
+            triggered:false, //set the trigger to true in ondata to fire ontrigger and reset the trigger
+            accum:this.DS.Struct('alert'), //data accumulated for checking a trigger
+            ondata,
+            ontrigger
+        };
+    }
+
+    //after the data is sorted these will trigger
+    getWatch(name) {
+        return this.watches[name];   
     }
 
     async sortStructsIntoTable(datastructs=[]) {
@@ -255,11 +269,13 @@ export class DataTablet {
                                 if(!this.data.byTime[timestamp])
                                     this.data.byTime[timestamp] = [dat];
                                 else this.data.byTime[timestamp].push(dat); 
+                                this.checkWatches(dat);
                                 this.onUpdate(timestamp, dat);
                                 newdata.push(dat);  
                             }
-                            if(sorted) {
+                            else {
                                 if(sorted.constructor?.name !== 'Promise') {
+                                    this.checkWatches(sorted);
                                     this.onUpdate(timestamp, sorted);
                                     newdata.push(sorted); 
                                 }
@@ -276,9 +292,11 @@ export class DataTablet {
                     if(!this.data[typ][timestamp])
                         this.data[typ][timestamp] = [struct];
                     else this.data[typ][timestamp].push(struct); 
+                    this.checkWatches(struct);
                     this.onUpdate(timestamp, struct);
                     newdata.push(struct);
                 } else {
+                    this.checkWatches(sorted);
                     this.onUpdate(timestamp, sorted);
                     newdata.push(sorted);
                 }
@@ -290,6 +308,7 @@ export class DataTablet {
         for(const prop in this.data) {
             this.data[prop] = this.sortObjectByPropName(this.data[prop]); //should arrange the object by timestamp
         }
+
 
         this.onSorted(newdata);
     }
