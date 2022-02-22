@@ -1,21 +1,21 @@
 
 //The data atlas is specifically for creating structs for location-based data.
 // Uses MNI acoordinates for head placement.
-
+import * as types from './types'
 
 /* Barebones struct format with basic metadata, append any additional props */
 export function Struct(
-    structType='struct', 
-    assignProps={},
-    parentUser={_id:undefined}, 
-    parentStruct={_id:undefined, structType:undefined}
+    structType:types.StructTypes='struct', 
+    assignProps:types.ArbitraryObject={},
+    parentUser:types.ArbitraryObject={_id:''},
+    parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) {
     
     function randomId(tag = '') {
         return `${tag+Math.floor(Math.random()+Math.random()*Math.random()*10000000000000000)}`;
     }
     
-    let struct = {
+    let struct: types.Struct = {
         _id: randomId(structType+'defaultId'),   //random id associated for unique identification, used for lookup and indexing
         structType: structType,     //this is how you will look it up by type in the server
         ownerId: parentUser?._id,     //owner user
@@ -24,7 +24,7 @@ export function Struct(
     }
 
     if(!struct.ownerId) delete struct.ownerId;
-    if(!struct.parent._id) delete struct.parent;
+    if(!struct?.parent?._id) delete struct.parent;
     if(Object.keys(assignProps).length > 0) Object.assign(struct,assignProps); //can overwrite any default props as well
     return struct;
 }
@@ -101,17 +101,17 @@ export const eegCoordinates = {
     O1: [-25.8, -93.3, 7.7],
     OZ: [0.3, -97.1, 8.7],
     O2: [25.0, -95.2, 6.2]
-}
+} as {[x:string]: number[]}
 
-export function setCoordinate(channelDict={ch:undefined}, assignTo={}) {
+export function setCoordinate(channelDict:any, assignTo={}) { // TODO: Define channelDict
     
     if(!eegCoordinates[channelDict.tag] && channelDict.position) {
-        eegCoordinates[channelDict.tag] = channelDict.position;
+        eegCoordinates[channelDict.tag] = [channelDict.position.x, channelDict.position.y, channelDict.position.z];
     }
 
     if(eegCoordinates[channelDict.tag]) {
         let props = {
-            channel:channelDict.ch,
+            channel: '',
             position:{
                 x:eegCoordinates[channelDict.tag][0],
                 y:eegCoordinates[channelDict.tag][1],
@@ -124,14 +124,14 @@ export function setCoordinate(channelDict={ch:undefined}, assignTo={}) {
 
 }
 
-export function EEGCoordinates(channelDicts=[], genCoherenceMap=true) {
+export function EEGCoordinates(channelDicts:[]=[], genCoherenceMap=true) {
     let structs = [];
     for(let channelDict of channelDicts) {
         let struct = EEGStruct(channelDict);
         structs.push(struct);
     }
     if(genCoherenceMap) {
-        structs.push(...CoherenceMap(channelDicts));
+        structs.push(...CoherenceMap({channelDicts}));
     }
 
     return structs;
@@ -139,10 +139,10 @@ export function EEGCoordinates(channelDicts=[], genCoherenceMap=true) {
 
 //Returns an object with arrays for each key. These will denote the frequencies represented in the FFT, split for quick reference in each band.
 export function FrequencyBandsStruct(
-    additionalBands=[], //add whatever tags
+    additionalBands:types.FrequencyBandNames[] = [], //add whatever tags
     assignTo={} //can assign properties to another object e.g. a fully loaded struct
 ) {
-    let bands = {
+    let bands: types.FrequencyBandsStruct = {
         scp: [], 
         delta: [], 
         theta: [], 
@@ -153,16 +153,16 @@ export function FrequencyBandsStruct(
         highgamma: []
     };
 
-    additionalBands.forEach(band => bands[band] = []); 
+    additionalBands.forEach((band:types.FrequencyBandNames) => bands[band] = []); 
 
     return Object.assign(assignTo,bands);
 }
 
 export function EEGStruct(
-    tag=undefined,
-    assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined}
+    tag:string = '',
+    assignProps:types.ArbitraryObject={},
+    parentUser:types.ArbitraryObject={_id:''},
+    parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) {
     let bands = FrequencyBandsStruct();
     let props = {
@@ -180,7 +180,7 @@ export function EEGStruct(
         startTime:Date.now()
     };
 
-    let struct = Struct('eeg',props,parentUser,parentStruct);
+    let struct = Struct('eeg', props, parentUser, parentStruct) as types.EEGStruct
     
     if(tag) setCoordinate(props,struct);
 
@@ -189,19 +189,19 @@ export function EEGStruct(
 
 export function CoherenceStruct(
     coords={0:EEGStruct('FP1'), 1:EEGStruct('FP2')},
-    assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined}, 
+    assignProps:types.ArbitraryObject={},
+    parentUser:types.ArbitraryObject={_id:''},
+    parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) {
     let bands = FrequencyBandsStruct();
 	let props =	{
         tag: coords[0]?.tag+"::"+coords[1]?.tag,
-        x0:  coords[0]?.x,
-        y0:  coords[0]?.y,
-        z0:  coords[0]?.z,
-        x1: coords[1]?.x,
-        y1: coords[1]?.y,
-        z1: coords[1]?.z,
+        x0:  coords[0]?.position?.x,
+        y0:  coords[0]?.position?.y,
+        z0:  coords[0]?.position?.z,
+        x1: coords[1]?.position?.x,
+        y1: coords[1]?.position?.y,
+        z1: coords[1]?.position?.z,
         fftCount: 0,
         fftTimes:[],
         ffts:[],
@@ -217,10 +217,10 @@ export function CoherenceStruct(
 }
 
 export function CoherenceMap(
-    opts={channelDicts:[{ch:0,tag:'FP1'},{ch:1,tag:'FP2'}],taggedOnly:true}, 
-    assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined},
+    opts:{channelDicts:any[], taggedOnly?:boolean}={channelDicts:[{ch:0, tag:'FP1', analyze: false},{ch:1,tag:'FP2', analyze: false}],taggedOnly:true}, 
+    _:types.ArbitraryObject={},
+    parentUser:types.ArbitraryObject={_id:''},
+    parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) {
     var cmap = [];
     var l = 1, k = 0;
@@ -234,7 +234,8 @@ export function CoherenceMap(
             var coord0 = EEGStruct(opts.channelDicts[k].tag);
             var coord1 = EEGStruct(opts.channelDicts[k+l].tag);
 
-            cmap.push(CoherenceStruct(coord0,coord1,parentUser,parentStruct,assignProps));
+            // cmap.push(CoherenceStruct(coord0,coord1,parentUser,parentStruct,assignProps));
+            cmap.push(CoherenceStruct({0: coord0, 1: coord1}, {}, parentUser,parentStruct));
         }
         l++;
         if (l + k === opts.channelDicts.length) {
@@ -247,10 +248,10 @@ export function CoherenceMap(
 }
 
 export function FNIRSStruct(
-    tag=undefined,
-    assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined}
+    tag:string = '',
+    assignProps:types.ArbitraryObject={},
+    parentUser:types.ArbitraryObject={_id:''},
+    parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) {
     let props = {
         tag:tag,
@@ -282,9 +283,9 @@ export function FNIRSStruct(
     };
 
     
-    let struct = Struct('fnirs',props,parentUser,parentStruct);
+    let struct = Struct('fnirs',props,parentUser,parentStruct) as types.FNIRSStruct
         
-    if(tag) setCoordinate(props,struct);
+    if(tag) setCoordinate(props, struct);
     
     return Object.assign(struct,assignProps);
 	
@@ -292,10 +293,10 @@ export function FNIRSStruct(
 
 
 export function IMUStruct(
-    tag=undefined,
-    assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined}
+    tag:string = '',
+    assignProps:types.ArbitraryObject={},
+    parentUser:types.ArbitraryObject={_id:''},
+    parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) {
     let props = {
         tag:tag,
@@ -317,10 +318,10 @@ export function IMUStruct(
 }
 
 export function EyeTrackerStruct(
-    tag=undefined,
-    assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined}
+    tag:string = '',
+    assignProps:types.ArbitraryObject={},
+    parentUser:types.ArbitraryObject={_id:''},
+    parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) {
 
     let props = {
@@ -342,10 +343,10 @@ export function EyeTrackerStruct(
 
 
 export function ECGStruct(
-    tag=undefined,
-    assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined}
+    tag:string = '',
+    assignProps:types.ArbitraryObject={},
+    parentUser:types.ArbitraryObject={_id:''},
+    parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) {
 
     let props = {
@@ -366,39 +367,30 @@ export function ECGStruct(
 }
 
 export function EDAStruct(
-    tag=undefined,
-    assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined} 
-) {
-
-}
-
-export function NeosensoryStruct(
-    tag=undefined,
-    assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined} 
+    _:string = '',
+    __={},
+    ___={_id:''},
+    ____={structType:'struct',_id:''} 
 ) {
 
 }
 
 export function PPGStruct(
-    tag=undefined,
-    assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined} 
+    tag:string = '',
+    assignProps:types.ArbitraryObject={},
+    parentUser:types.ArbitraryObject={_id:''},
+    parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) { 
-    let struct = FNIRSStruct(tag,parentUser,parentStruct,assignProps);
+    let struct = FNIRSStruct(tag,parentUser,parentStruct, assignProps);
     struct.structType = 'ppg';
     return struct;
 }
 
 export function HRVStruct(
-    tag=undefined,
-    assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined}
+    tag:string = '',
+    assignProps:types.ArbitraryObject={},
+    parentUser:types.ArbitraryObject={_id:''},
+    parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) { 
     let struct = ECGStruct(tag,parentUser,parentStruct,assignProps);
     struct.structType = 'hrv';
@@ -406,12 +398,12 @@ export function HRVStruct(
 }
 
 export function EMGStruct(
-    tag=undefined,
-    assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined} 
+    tag:string = '',
+    assignProps:types.ArbitraryObject={},
+    parentUser:types.ArbitraryObject={_id:''},
+    parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) { 
-    let struct = EEGStruct(tag,parentUser,parentStruct,assignProps);
+    let struct = EEGStruct(tag,parentUser,parentStruct, assignProps);
     struct.structType = 'emg';
     return struct;
 }
@@ -420,10 +412,10 @@ export function EMGStruct(
 //User defined structs e.g. for building a communication database
 
 export function ProfileStruct(
-    tag=undefined,
-    assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined} 
+    tag:string = '',
+    assignProps:types.ArbitraryObject={},
+    parentUser:types.ArbitraryObject={_id:''},
+    parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) {
 
     let props = {
@@ -447,10 +439,10 @@ export function ProfileStruct(
 }
 
 export function AuthorizationStruct(
-    tag=undefined,
+    tag:string = '',
     assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined} 
+    parentUser={_id:''},
+    parentStruct={structType:'struct',_id:''} 
 ) {
     let props = {
         tag:tag,
@@ -474,10 +466,10 @@ export function AuthorizationStruct(
 }
 
 export function GroupStruct(
-    tag=undefined,
+    tag:string = '',
     assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined} 
+    parentUser={_id:''},
+    parentStruct={structType:'struct',_id:''} 
 ) {
     let props = {
         tag:tag,
@@ -495,10 +487,10 @@ export function GroupStruct(
 }
 
 export function DataStruct(
-    tag=undefined,
+    tag:string = '',
     assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined} 
+    parentUser={_id:''},
+    parentStruct={structType:'struct',_id:''} 
 ) {
     let props = {
         tag:       tag,
@@ -515,10 +507,10 @@ export function DataStruct(
 }
 
 export function EventStruct(
-    tag=undefined,
+    tag:string = '',
     assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined} 
+    parentUser={_id:''},
+    parentStruct={structType:'struct',_id:''} 
 ) {
     let props = {
         tag: tag,
@@ -539,10 +531,10 @@ export function EventStruct(
 }
 
 export function ChatroomStruct(
-    tag=undefined,
+    tag:string = '',
     assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined} 
+    parentUser={_id:''},
+    parentStruct={structType:'struct',_id:''} 
 ) {
     let props = {
         tag:tag,
@@ -564,10 +556,10 @@ export function ChatroomStruct(
 }
 
 export function CommentStruct(
-    tag=undefined,
+    tag:string = '',
     assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined} 
+    parentUser={_id:''},
+    parentStruct={structType:'struct',_id:''} 
 ) {
     let props = {
         tag: tag,
@@ -587,10 +579,10 @@ export function CommentStruct(
 }
 
 export function NotificationStruct(
-    tag=undefined,
+    tag:string = '',
     assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined} 
+    parentUser={_id:''},
+    parentStruct={structType:'struct',_id:''} 
 ) {
     let props = {
         tag:tag,
@@ -606,10 +598,10 @@ export function NotificationStruct(
 
 
 export function ScheduleStruct(
-    tag=undefined,
+    tag:string = '',
     assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined} 
+    parentUser={_id:''},
+    parentStruct={structType:'struct',_id:''} 
 ) {
     let props = {
         tag:tag,
@@ -626,10 +618,10 @@ export function ScheduleStruct(
 }
 
 export function DateStruct(
-    tag=undefined,
+    tag:string = '',
     assignProps={},
-    parentUser={_id:undefined},
-    parentStruct={structType:undefined,_id:undefined} 
+    parentUser={_id:''},
+    parentStruct={structType:'struct',_id:''} 
 ) {
     let props = {
         tag:tag,
@@ -657,7 +649,6 @@ export const structRegistry = {
     EyeTrackerStruct,
     ECGStruct,
     EDAStruct,
-    NeosensoryStruct,
     PPGStruct,
     HRVStruct,
     EMGStruct,

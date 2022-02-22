@@ -1,6 +1,47 @@
 import * as DS from './DataStructures'
+import { ArbitraryObject, Struct, DataTypes } from './types';
 
 export class DataTablet {
+
+    // NOTE: Totally undefined
+    workerId: any;
+    id: any;
+    
+    threaded: boolean;
+    workers: any;
+    DS: any = DS;
+    collections: Map<string, any> = new Map();
+    data: {
+        byTime:ArbitraryObject, //everything is arranged by time
+        notes:ArbitraryObject,
+        events:ArbitraryObject,
+        sleep:ArbitraryObject, //or everything is arranged by type (then by time)
+        food:ArbitraryObject,
+        hr:ArbitraryObject,
+        ppg:ArbitraryObject,
+        hrv: ArbitraryObject,
+        ecg:ArbitraryObject,
+        emg:ArbitraryObject,
+        eeg:ArbitraryObject,
+        fnirs:ArbitraryObject
+    } = {
+        byTime:{}, //everything is arranged by time
+        notes:{},
+        events:{},
+        sleep:{}, //or everything is arranged by type (then by time)
+        food:{},
+        hr:{},
+        ppg:{},
+        hrv:{},
+        ecg:{},
+        emg:{},
+        eeg:{},
+        fnirs:{}
+    }
+
+    rolloverLimit:number = 50000;
+    dataSorts:Map<string, any> = new Map(); //what to do with data based on struct or data type
+    watches:ArbitraryObject = {};
 
     constructor(
         props={},
@@ -10,29 +51,7 @@ export class DataTablet {
 
         this.threaded = threaded;
         if(magicworker) this.workers=magicworker;
-        else if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) {
-            this.threaded = 2;
-        }
-
-        this.DS = DS;
-
-        this.collections = new Map();
-
-        this.data = {
-            byTime:{}, //everything is arranged by time
-            notes:{},
-            events:{},
-            sleep:{}, //or everything is arranged by type (then by time)
-            food:{},
-            hr:{},
-            ppg:{},
-            ecg:{},
-            emg:{},
-            eeg:{},
-            fnirs:{}
-        }
-
-        this.rolloverLimit = 50000;
+        else if (typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope) this.threaded = true;
 
         Object.assign(this.data,props);
 
@@ -41,7 +60,7 @@ export class DataTablet {
 
         this.setSort(
             'event',
-            (dataObj,newdata,tablet=this)=>{
+            (dataObj:any)=>{
                 if(!this.data.events[dataObj.timestamp])
                     this.data.events[dataObj.timestamp] = [dataObj];
                 else this.data.events[dataObj.timestamp].push(dataObj);
@@ -58,7 +77,7 @@ export class DataTablet {
 
         this.setSort(
             ['notes','note','link'],
-            (dataObj,newdata,tablet=this) => {
+            (dataObj:any) => {
                 if(!this.data.notes[dataObj.timestamp])
                     this.data.notes[dataObj.timestamp] = [dataObj];
                 else this.data.notes[dataObj.timestamp].push(dataObj);
@@ -81,9 +100,9 @@ export class DataTablet {
         return `${tag+Math.floor(Math.random()+Math.random()*Math.random()*10000000000000000)}`;
     }
 
-    setLocalData (structs) {
+    setLocalData (structs: any[]) {
 
-        let setInCollection = (s) => {
+        let setInCollection = (s:any) => {
             let type = s.structType;
         
             let collection = this.collections.get(type);
@@ -104,10 +123,12 @@ export class DataTablet {
     }
 
     //pull a struct by collection, owner, and key/value pair from the local platform, leave collection blank to pull all ownerId associated data
-    getLocalData(collection, query) {
+    getLocalData(collection:string, query:any) {
 
         // Split Query
-        let ownerId, key, value;
+        let ownerId:string = ''
+        let key:string = ''
+        let value:any = ''
         if (typeof query === 'object'){
             ownerId = query.ownerId
             // TODO: Make more robust. Does not support more than one key (aside from ownerId)
@@ -118,7 +139,7 @@ export class DataTablet {
         
         if (!collection && !ownerId && !key && !value) return [];
 
-        let result = [];
+        let result:any[] = [];
         if(!collection && (ownerId || key)) {
             this.collections.forEach((c) => { //search all collections
                 if((key === '_id' || key === 'id') && value) {
@@ -126,7 +147,7 @@ export class DataTablet {
                     if(found) result.push(found);
                 }
                 else {
-                    c.forEach((struct) => {
+                    c.forEach((struct:any) => {
                         if(key && value) {
                             if(struct[key] === value && struct.ownerId === ownerId) {
                                 result.push(struct);
@@ -145,13 +166,13 @@ export class DataTablet {
             if(!c) return result; 
 
             if(!key && !ownerId) {
-                c.forEach((struct) => {result.push(struct);})
+                c.forEach((struct:any) => {result.push(struct);})
                 return result; //return the whole collection
             }
             
             if((key === '_id' || key === 'id') && value) return c.get(value); //collections store structs by id so just get the one struct
             else {
-                c.forEach((struct,k) => {
+                c.forEach((struct:any,_:string) => {
                     if(key && value && !ownerId) {
                         if(struct[key] === value) result.push(struct);
                     }   
@@ -169,23 +190,25 @@ export class DataTablet {
         return result;                            //return an array of results
     }
 
-    //customize what to do with the updated collection after setting
-    onCollectionSet = (typ,collection) => {
+    // //customize what to do with the updated collection after setting
+    onCollectionSet = (_:any, __:any) => {
     
     }
 
-    runSort(key,dataObj={},newdata=[],tablet=this) {
+    runSort(key:string,dataObj={},newdata=[],tablet=this) {
+        let result:any;
         if(this.threaded === false) {
-            let result;
             let sort = this.getSort(key);
-            if(sort) result = sort(dataObj,newdata,tablet);
+            if (sort) result = sort(dataObj,newdata,tablet);
             else return false;
         } else if (this.threaded === true) {
             return this.workers.runWorkerFunction('runSort',[key,dataObj,newdata],this.workerId,this.id);
         }
+
+        return result
     }
 
-    setSort(key,response=(dataObj)=>{return true;}) {
+    setSort(key:string | string[],response=(_:any)=>{return true;}) {
         if(this.threaded === false) {
             if(Array.isArray(key))
                 key.forEach((k) => {this.dataSorts.set(k,response);});
@@ -196,7 +219,7 @@ export class DataTablet {
         }
     }
 
-    getSort(key) {
+    getSort(key:string) {
         if(this.threaded === false) {
             return this.dataSorts.get(key);
         } else if (this.threaded === true) {
@@ -204,7 +227,7 @@ export class DataTablet {
         }
     }
 
-    checkWatches(sorted) {
+    checkWatches(sorted:ArbitraryObject={}) {
         for(const prop in this.watches) {
             this.watches[prop].ondata(sorted, this.watches[prop].accum, this.watches[prop]);
             if(this.watches[prop].triggered) { //manual trigger function
@@ -214,8 +237,10 @@ export class DataTablet {
         }
     }
 
+    ontrigger = (_:any) => {}
+
     //after the data is sorted these will trigger
-    setWatch(name,ondata=(struct,accum,watch)=>{},ontrigger=(data)=>{}) {
+    setWatch(name:string,ondata=(_:any,__:any,___:any)=>{},ontrigger=(_:any)=>{}) {
         this.watches[name] = {
             triggered:false, //set the trigger to true in ondata to fire ontrigger and reset the trigger
             accum:this.DS.Struct('alert'), //data accumulated for checking a trigger
@@ -225,19 +250,19 @@ export class DataTablet {
     }
 
     //after the data is sorted these will trigger
-    getWatch(name) {
+    getWatch(name:string) {
         return this.watches[name];   
     }
 
-    async sortStructsIntoTable(datastructs=[]) {
+    async sortStructsIntoTable(datastructs:Struct[]=[]) {
         //sort by timestamp 
-        let ascending = function(a,b) { return a.timestamp - b.timestamp; }
+        let ascending = function(a:any,b:any) { return a.timestamp - b.timestamp; }
         /**
          * let descending = function(a,b) { return b.timestamp-a.timestamp };
          */
         datastructs.sort(ascending); //reorder
 
-        let newdata = [];
+        let newdata:any[] = [];
 
         //now distribute into data
         for(let i = 0; i < datastructs.length; i++) {
@@ -249,16 +274,16 @@ export class DataTablet {
                 this.data.byTime[timestamp] = [struct];
             else this.data.byTime[timestamp].push(struct);
 
-            if(struct.structType === 'dataInstance') {
+            if(struct.structType === 'dataInstance' && struct.data) {
                 //we should sort instanced fitbit data into timestamped bins with markers for different resolutions
                 //other data in dataInstance.data array will be like {dataType:'notes',data:'abcdefg'} 
-                struct.data.forEach(async (dat) => {
+                struct.data.forEach(async (dat:any) => {
                     if(typeof dat === 'object' && !Array.isArray(dat)) {
-                        let typ = dat.dataType;
+                        let typ:DataTypes = dat.dataType;
                         dat.ownerId = struct.ownerId;
                         if(!dat.timestamp) dat.timestamp = timestamp;
                         if(typ) {
-                            let sorted = this.runSort(typ,dat,newdata,this);
+                            let sorted = this.runSort(typ,dat, newdata as any,this);
                             if(!sorted) { //generic
                                 if(!this.data[typ]) this.data[typ] = {};
     
@@ -285,9 +310,9 @@ export class DataTablet {
                 });
             }
             else {
-                let sorted = this.runSort(struct.structType,struct,newdata,this);
+                let sorted = this.runSort(struct.structType,struct,newdata as any,this);
                 if(!sorted) { //generic
-                    let typ = struct.structType;
+                    let typ = struct.structType as DataTypes; // TODO: Reconcile that dataInstance could be the type...
                     if(!this.data[typ]) this.data[typ] = {};
                     if(!this.data[typ][timestamp])
                         this.data[typ][timestamp] = [struct];
@@ -306,35 +331,35 @@ export class DataTablet {
         }
 
         for(const prop in this.data) {
-            this.data[prop] = this.sortObjectByPropName(this.data[prop]); //should arrange the object by timestamp
+            this.data[prop as DataTypes] = this.sortObjectByPropName(this.data[prop as DataTypes]); //should arrange the object by timestamp
         }
 
 
         this.onSorted(newdata);
     }
 
-    onUpdate(timestamp, struct, data=this.data) {}
+    onUpdate(_:any, __:any, ___=this.data) {}
 
-    onSorted(newdata=[]) {}
+    onSorted(_:any[]=[]) {}
 
-    getDataByTimestamp(timestamp,ownerId) {
+    getDataByTimestamp(timestamp: number, ownerId: string) {
         if(this.threaded === true) {
             //if running threads this needs to be awaited or do .then(res)
             return this.workers.runWorkerFunction('getDataByTimestamp',[timestamp,ownerId],this.workerId,this.id);
         }
 
         let result = this.data.byTime[timestamp];
-        if(ownerId && result) result = result.filter((o)=>{if(!ownerId) return true; else if(ownerId === o.ownerId) return true;});
+        if(ownerId && result) result = result.filter((o:any)=>{if(!ownerId) return true; else if(ownerId === o.ownerId) return true; else return false});
         return result;
     }
 
-    getDataByTimeRange(begin,end,type,ownerId) {
+    getDataByTimeRange(begin:number,end:number,type:DataTypes,ownerId:string) {
         if(this.threaded === true) {
             //if running threads this needs to be awaited or do .then(res)
             return this.workers.runWorkerFunction('getDataByTimeRange',[begin,end,type,ownerId],this.workerId,this.id);
         }
 
-        let result = {};
+        let result:ArbitraryObject = {};
         if(type) {
             for(const key in this.data[type]) {
                 let t = parseInt(key);
@@ -357,9 +382,9 @@ export class DataTablet {
         }
         if(ownerId && result) {
             for(const key in result) {
-                let popidx = [];
+                let popidx:any[] = [];
                 result[key] = result[key];
-                result[key].forEach((o,i) => {
+                result[key].forEach((o:any, i:number) => {
                     if(o.ownerId !== ownerId) {
                         popidx.push(i);
                     }
@@ -374,7 +399,7 @@ export class DataTablet {
         return result;
     }
 
-    getDataByType(type,timestamp,ownerId) {
+    getDataByType(type:DataTypes,timestamp:number,ownerId:string) {
         if(!this.data[type]) return undefined;
 
         let result = {...this.data[type]};
@@ -382,9 +407,9 @@ export class DataTablet {
 
         if(ownerId && result) {
             for(const key in result) {
-                let popidx = [];
+                let popidx:any[] = [];
                 result[key] = [...result[key]];
-                result[key].forEach((o,i) => {
+                result[key].forEach((o:any, i:number) => {
                     if(o.ownerId !== ownerId) {
                         popidx.push(i);
                     }
@@ -402,27 +427,28 @@ export class DataTablet {
         
     }
 
-    filterSleepResults(unfiltered = {}) {
+    filterSleepResults(unfiltered:ArbitraryObject = {}) {
         //need to check if any events are overlapping with fitbit data then pop any fitbit data, assuming events are more accurate
         let events = [];
         for(const key in unfiltered) {
             unfiltered[key] = [...unfiltered[key]]; //copy result
-            events.push(...unfiltered[key].filter((o) => {
+            events.push(...unfiltered[key].filter((o:any) => {
                 if(o.structType === 'event') return true;
+                else return false
             }));
         }
 
         events.forEach((ev) => {
             let foundidx = undefined;
             for(const key in unfiltered) {
-                unfiltered[key].forEach((o) => {
+                unfiltered[key].forEach((o:any, i:number) => {
                     //assume sleep data within 12 hours and longer than 2 hours is to be replaced
                     if(o.structType === 'fitbitsleep' && ev.startTime && ev.endTime) {
                         if(Math.abs(o.startTime - ev.startTime) < 1000*12*3600 && Math.abs(o.endTime - ev.endTime) < 1000*12*3600 && (ev.endTime - ev.startTime) > 1000*2*3600) {
                             foundidx = i;
                             return true;
-                        }  
-                    }
+                        } else return false
+                    } else return false
                 }); 
                 if(foundidx) unfiltered[key].splice(foundidx,1);
             }   
@@ -432,10 +458,10 @@ export class DataTablet {
         return result;
     } 
 
-    sortObjectByPropName(object) {
+    sortObjectByPropName(object:ArbitraryObject) {
 
         const ordered = Object.keys(object).sort().reduce(
-            (obj, key) => { 
+            (obj: ArbitraryObject, key: string) => { 
               obj[key] = object[key]; 
               return obj;
             }, 
@@ -446,13 +472,13 @@ export class DataTablet {
     }
 
     //cuts array sizes of object properties in the collection to the set limit (holdover from DataAtlas)
-    checkRollover(collection, limit=this.rolloverLimit) { //'eeg','heg', etc
+    checkRollover(collection:string, limit=this.rolloverLimit) { //'eeg','heg', etc
 		if(!collection) return false;
 
         let c = this.collections.get(collection);
         if(!c) return false;
 
-        c.forEach((struct) => {
+        c.forEach((struct:any) => {
             for(const prop in struct) {
                 if(Array.isArray(struct[prop])) {
                     if(struct[prop].length > limit)  {
@@ -469,6 +495,8 @@ export class DataTablet {
                 }
             }
         });
+
+        return true
 
 	}
 

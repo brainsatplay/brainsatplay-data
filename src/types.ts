@@ -1,11 +1,19 @@
+export type ArbitraryObject = {[x:string]: any}
 
 export type Struct = {
-    _id:string|number,
-    structType:string,
+    _id:string,
+    id?:string,
+    structType:StructTypes,
     timestamp?:string|number,
     ownerId?:string|number,
     parent?:{structType:string,_id:string|number}
+    data?: [] // For DataInstance Strucxt
 }
+
+export type DataTypes = 'byTime' | 'notes' | 'events' | 'sleep' | 'food' | 'hr' | 'ppg' | 'hrv' | 'ecg' | 'emg' | 'eeg' | 'fnirs'
+export type StructTypes = LooseStructTypes | DataTypes | 'dataInstance' | 'struct' | string
+export type LooseStructTypes = 'coherence' | 'imu' | 'eyetracker' | 'profile' | 'authorization' | 'group' | 'event' | 'chatroom' | 'comment' | 'notification' | 'schedule' | 'date'
+
 
 export type Data = {
     type: string, //helps the frontend identify this object
@@ -121,6 +129,8 @@ export type GroupStruct = {
 
 type FreqBand = [number[],number[]]
 
+export type FrequencyBandNames = 'scp' | 'delta' | 'theta' | 'alpha1' | 'alpha2' | 'beta' | 'lowgamma' | 'highgamma'
+
 export type FrequencyBandsStruct = {
     scp: FreqBand|[], 
     delta: FreqBand|[], 
@@ -133,7 +143,7 @@ export type FrequencyBandsStruct = {
 }
 
 export type EEGStruct = {
-    tag:string|number, 
+    tag:string, 
     position:{x:number,y:number,z:number},
     count:number,
     times:number[], 
@@ -164,7 +174,7 @@ export type CoherenceStruct = {
 } & Struct
 
 export type FNIRSStruct = {
-    tag:string|number,
+    tag:string,
     position:{x:number,y:number,z:number},
     count:number,
     times:number[],
@@ -204,7 +214,7 @@ export type IMUStruct = {
 } & Struct
 
 export type ECGStruct = {
-    tag:string|number,
+    tag:string,
     count:number,
     times:number[],
     raw:number[],
