@@ -209,7 +209,7 @@ export class DataTablet {
         return result
     }
 
-    setSort(key:string | string[],response=(data:any,newdata:any[]=[],tablet=this)=>{ console.log(tablet); newdata.push(data); return data;}) {
+    setSort(key:string | string[],response=(data:any,newdata:any[]=[],tablet=this)=>{}) {
         if(this.threaded === false) {
             if(Array.isArray(key))
                 key.forEach((k) => {this.dataSorts.set(k,response);});
