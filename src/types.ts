@@ -1,4 +1,4 @@
-export type ArbitraryObject = {[x:string]: any}
+export type ArbitraryObject = {[x:string|number]: any}
 
 export type Struct = {
     _id:string,
@@ -22,7 +22,7 @@ export type Data = {
 }
 
 export type DataStruct = {
-    tag:string,
+    tag:string|number|undefined,
     title:      string|undefined,
     author:     string|undefined,
     expires:    boolean|number|string, //date of expiration, or never. Data that never expires should generally only be patient controlled stuff so its transparent
@@ -31,7 +31,7 @@ export type DataStruct = {
 } & Struct
 
 export type EventStruct = {
-    tag:string,
+    tag:string|number|undefined,
     event:string, //event type e.g. relapse, hospitalization
     author:string,
     startTime:string,  //event began
@@ -43,7 +43,7 @@ export type EventStruct = {
 } & Struct
 
 export type ChatroomStruct = {
-    tag:string,
+    tag:string|number|undefined,
     message:string,
     topic:string,
     author:string,
@@ -56,7 +56,7 @@ export type ChatroomStruct = {
 } & Struct
 
 export type CommentStruct = {
-    tag:string,
+    tag:string|number|undefined,
     author:string,
     replyTo:string,
     attachments: Data|string|number[],
@@ -65,13 +65,13 @@ export type CommentStruct = {
 } & Struct
 
 export type NotificationStruct = {
-    tag:string,
+    tag:string|number|undefined,
     note:string,
     parentUserId:string
 } & Struct
 
 export type ScheduleStruct = {
-    tag:string,
+    tag:string|number|undefined,
     title:string,
     author:string,
     attachments: Data|string|number[],
@@ -79,7 +79,7 @@ export type ScheduleStruct = {
 } & Struct
 
 export type DateStruct = {
-    tag:string,
+    tag:string|number|undefined,
     timeSet:string|number,
     notes:string,
     recurs:number|string|boolean,
@@ -87,7 +87,7 @@ export type DateStruct = {
 } & Struct
 
 export type ProfileStruct = {
-    tag:string,
+    tag:string|number|undefined,
     username:  string,
     name?:      string, 
     firstName?: string, 
@@ -101,7 +101,7 @@ export type ProfileStruct = {
 } & Struct
 
 export type AuthorizationStruct = {
-    tag:string,
+    tag:string|number|undefined,
     authorizedId:     string,
     authorizedName:   string,
     authorizerId:     string,
@@ -117,7 +117,7 @@ export type AuthorizationStruct = {
 
 
 export type GroupStruct = {
-    tag:string,
+    tag:string|number|undefined,
     name:string,
     details:string,
     admins:string|number[], //user ids
@@ -143,7 +143,7 @@ export type FrequencyBandsStruct = {
 }
 
 export type EEGStruct = {
-    tag:string, 
+    tag:string|number|undefined, 
     position:{x:number,y:number,z:number},
     count:number,
     times:number[], 
@@ -174,7 +174,7 @@ export type CoherenceStruct = {
 } & Struct
 
 export type FNIRSStruct = {
-    tag:string,
+    tag:string|number|undefined,
     position:{x:number,y:number,z:number},
     count:number,
     times:number[],
@@ -203,7 +203,7 @@ export type FNIRSStruct = {
 } & Struct
 
 export type IMUStruct = {
-    tag:string,
+    tag:string|number|undefined,
     Ax:number[],
     Ay:number[],
     Az:number[],
@@ -214,7 +214,7 @@ export type IMUStruct = {
 } & Struct
 
 export type ECGStruct = {
-    tag:string,
+    tag:string|number|undefined,
     count:number,
     times:number[],
     raw:number[],

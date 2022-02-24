@@ -159,7 +159,7 @@ export function FrequencyBandsStruct(
 }
 
 export function EEGStruct(
-    tag:string = '',
+    tag:string|number|undefined = '',
     assignProps:types.ArbitraryObject={},
     parentUser:types.ArbitraryObject={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
@@ -248,7 +248,7 @@ export function CoherenceMap(
 }
 
 export function FNIRSStruct(
-    tag:string = '',
+    tag:string|number|undefined = '',
     assignProps:types.ArbitraryObject={},
     parentUser:types.ArbitraryObject={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
@@ -293,7 +293,7 @@ export function FNIRSStruct(
 
 
 export function IMUStruct(
-    tag:string = '',
+    tag:string|number|undefined = '',
     assignProps:types.ArbitraryObject={},
     parentUser:types.ArbitraryObject={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
@@ -318,7 +318,7 @@ export function IMUStruct(
 }
 
 export function EyeTrackerStruct(
-    tag:string = '',
+    tag:string|number|undefined = '',
     assignProps:types.ArbitraryObject={},
     parentUser:types.ArbitraryObject={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
@@ -343,7 +343,7 @@ export function EyeTrackerStruct(
 
 
 export function ECGStruct(
-    tag:string = '',
+    tag:string|number|undefined = '',
     assignProps:types.ArbitraryObject={},
     parentUser:types.ArbitraryObject={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
@@ -376,7 +376,7 @@ export function EDAStruct(
 }
 
 export function PPGStruct(
-    tag:string = '',
+    tag:string|number|undefined = '',
     assignProps:types.ArbitraryObject={},
     parentUser:types.ArbitraryObject={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
@@ -387,7 +387,7 @@ export function PPGStruct(
 }
 
 export function HRVStruct(
-    tag:string = '',
+    tag:string|number|undefined = '',
     assignProps:types.ArbitraryObject={},
     parentUser:types.ArbitraryObject={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
@@ -398,7 +398,7 @@ export function HRVStruct(
 }
 
 export function EMGStruct(
-    tag:string = '',
+    tag:string|number|undefined = '',
     assignProps:types.ArbitraryObject={},
     parentUser:types.ArbitraryObject={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
@@ -412,7 +412,7 @@ export function EMGStruct(
 //User defined structs e.g. for building a communication database
 
 export function ProfileStruct(
-    tag:string = '',
+    tag:string|number|undefined = '',
     assignProps:types.ArbitraryObject={},
     parentUser:types.ArbitraryObject={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
@@ -439,7 +439,7 @@ export function ProfileStruct(
 }
 
 export function AuthorizationStruct(
-    tag:string = '',
+    tag:string|number|undefined = '',
     assignProps={},
     parentUser={_id:''},
     parentStruct={structType:'struct',_id:''} 
@@ -466,7 +466,7 @@ export function AuthorizationStruct(
 }
 
 export function GroupStruct(
-    tag:string = '',
+    tag:string|number|undefined = '',
     assignProps={},
     parentUser={_id:''},
     parentStruct={structType:'struct',_id:''} 
@@ -487,7 +487,7 @@ export function GroupStruct(
 }
 
 export function DataStruct(
-    tag:string = '',
+    tag:string|number|undefined = '',
     assignProps={},
     parentUser={_id:''},
     parentStruct={structType:'struct',_id:''} 
@@ -507,7 +507,7 @@ export function DataStruct(
 }
 
 export function EventStruct(
-    tag:string = '',
+    tag:string|number|undefined = '',
     assignProps={},
     parentUser={_id:''},
     parentStruct={structType:'struct',_id:''} 
@@ -531,7 +531,7 @@ export function EventStruct(
 }
 
 export function ChatroomStruct(
-    tag:string = '',
+    tag:string|number|undefined = '',
     assignProps={},
     parentUser={_id:''},
     parentStruct={structType:'struct',_id:''} 
@@ -556,7 +556,7 @@ export function ChatroomStruct(
 }
 
 export function CommentStruct(
-    tag:string = '',
+    tag:string|number|undefined = '',
     assignProps={},
     parentUser={_id:''},
     parentStruct={structType:'struct',_id:''} 
@@ -579,7 +579,7 @@ export function CommentStruct(
 }
 
 export function NotificationStruct(
-    tag:string = '',
+    tag:string|number|undefined = '',
     assignProps={},
     parentUser={_id:''},
     parentStruct={structType:'struct',_id:''} 
@@ -598,7 +598,7 @@ export function NotificationStruct(
 
 
 export function ScheduleStruct(
-    tag:string = '',
+    tag:string|number|undefined = '',
     assignProps={},
     parentUser={_id:''},
     parentStruct={structType:'struct',_id:''} 
@@ -618,7 +618,7 @@ export function ScheduleStruct(
 }
 
 export function DateStruct(
-    tag:string = '',
+    tag:string|number|undefined = '',
     assignProps={},
     parentUser={_id:''},
     parentStruct={structType:'struct',_id:''} 

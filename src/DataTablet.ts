@@ -1,6 +1,7 @@
 import * as DS from './DataStructures'
 import { ArbitraryObject, Struct, DataTypes } from './types';
 
+
 export class DataTablet {
 
     // NOTE: Totally undefined
@@ -41,7 +42,7 @@ export class DataTablet {
 
     rolloverLimit:number = 50000;
     dataSorts:Map<string, any> = new Map(); //what to do with data based on struct or data type
-    watches:ArbitraryObject = {};
+    watches:any = {};
 
     constructor(
         props={},
@@ -191,8 +192,8 @@ export class DataTablet {
     }
 
     // //customize what to do with the updated collection after setting
-    onCollectionSet = (_:any, __:any) => {
-    
+    onCollectionSet = (type:any, collection:any) => {
+        
     }
 
     runSort(key:string,dataObj={},newdata=[],tablet=this) {
@@ -240,7 +241,7 @@ export class DataTablet {
     ontrigger = (_:any) => {}
 
     //after the data is sorted these will trigger
-    setWatch(name:string,ondata=(_:any,__:any,___:any)=>{},ontrigger=(_:any)=>{}) {
+    setWatch(name:string,ondata=(sorted:any,accum:any,watchObj:any)=>{},ontrigger=(_:any)=>{}) {
         this.watches[name] = {
             triggered:false, //set the trigger to true in ondata to fire ontrigger and reset the trigger
             accum:this.DS.Struct('alert'), //data accumulated for checking a trigger
