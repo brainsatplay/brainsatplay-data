@@ -19,6 +19,7 @@ esbuild.build({
   bundle:true,
   outfile:'dist/index.esm.js',
   format:'iife',
+  minify:true,
   plugins:[ 
   dtsPlugin() 
 ]
