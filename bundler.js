@@ -4,23 +4,37 @@ import { dtsPlugin } from 'esbuild-plugin-d.ts'
 
 import esbuild from 'esbuild'
 
-esbuild.build({
-  entryPoints:['src/index.ts'],
-  bundle:true,
-  outfile:'dist/index.js',
-  format:'cjs',
-  plugins:[ 
-    dtsPlugin() 
-  ]
-})
+console.time('es');
+console.log('esbuild starting!')
 
-esbuild.build({
-  entryPoints:['src/index.ts'],
+const entryPoints = ['src/index.ts'];
+const outfile = 'dist/index';
+
+esbuild.build({ //commonjs
+  entryPoints,
   bundle:true,
-  outfile:'dist/index.esm.js',
+  outfile:outfile+'.js',
+  format:'cjs'
+});
+
+esbuild.build({ //esmodules
+  entryPoints,
+  bundle:true,
+  outfile:outfile+'.esm.js',
+  format:'esm',
+  minify:true
+});
+
+esbuild.build({ //generates types correctly
+  entryPoints,
+  bundle:true,
+  outfile:outfile+'.iife.js',
   format:'iife',
   minify:true,
   plugins:[ 
-  dtsPlugin() 
-]
-})
+    dtsPlugin() 
+  ]
+});
+
+console.log('esbuild completed!')
+console.timeEnd('es');
