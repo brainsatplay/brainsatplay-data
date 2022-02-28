@@ -26,7 +26,7 @@ export function Struct(
     if(!struct.ownerId) delete struct.ownerId;
     if(!struct?.parent?._id) delete struct.parent;
     if(Object.keys(assignProps).length > 0) Object.assign(struct,assignProps); //can overwrite any default props as well
-    return struct;
+    return struct as types.Struct;
 }
 
 export const eegCoordinates = {
@@ -134,7 +134,7 @@ export function EEGCoordinates(channelDicts:[]=[], genCoherenceMap=true) {
         structs.push(...CoherenceMap({channelDicts}));
     }
 
-    return structs;
+    return structs as types.EEGStruct[];
 }
 
 //Returns an object with arrays for each key. These will denote the frequencies represented in the FFT, split for quick reference in each band.
@@ -184,7 +184,7 @@ export function EEGStruct(
     
     if(tag) setCoordinate(props,struct);
 
-    return Object.assign(struct,assignProps);
+    return Object.assign(struct,assignProps) as types.EEGStruct;
 }
 
 export function CoherenceStruct(
@@ -212,7 +212,7 @@ export function CoherenceStruct(
 
     let struct = Struct('coherence',props,parentUser,parentStruct);
     
-    return Object.assign(struct,assignProps);
+    return Object.assign(struct,assignProps) as types.CoherenceStruct;
     
 }
 
@@ -244,7 +244,7 @@ export function CoherenceMap(
         }
     }
     //console.log(cmap,channelTags);
-    return cmap;
+    return cmap as types.CoherenceStruct[];
 }
 
 export function FNIRSStruct(
@@ -287,7 +287,7 @@ export function FNIRSStruct(
         
     if(tag) setCoordinate(props, struct);
     
-    return Object.assign(struct,assignProps);
+    return Object.assign(struct,assignProps) as types.FNIRSStruct;
 	
 }
 
@@ -313,7 +313,7 @@ export function IMUStruct(
 
     if(tag) setCoordinate(props,struct);
     
-    return Object.assign(struct,assignProps);
+    return Object.assign(struct,assignProps) as types.IMUStruct;
 
 }
 
@@ -337,7 +337,7 @@ export function EyeTrackerStruct(
     
     let struct = Struct('eyetracker',props,parentUser,parentStruct);
     
-    return Object.assign(struct,assignProps);
+    return Object.assign(struct,assignProps) as types.EyeTrackerStruct;
 
 }
 
@@ -362,7 +362,7 @@ export function ECGStruct(
     
     let struct = Struct('ecg',props,parentUser,parentStruct);
     
-    return Object.assign(struct,assignProps);
+    return Object.assign(struct,assignProps) as types.ECGStruct;
     
 }
 
@@ -383,7 +383,7 @@ export function PPGStruct(
 ) { 
     let struct = FNIRSStruct(tag,parentUser,parentStruct, assignProps);
     struct.structType = 'ppg';
-    return struct;
+    return struct as types.PPGStruct;
 }
 
 export function HRVStruct(
@@ -394,7 +394,7 @@ export function HRVStruct(
 ) { 
     let struct = ECGStruct(tag,parentUser,parentStruct,assignProps);
     struct.structType = 'hrv';
-    return struct;
+    return struct as types.HRVStruct;
 }
 
 export function EMGStruct(
@@ -405,7 +405,7 @@ export function EMGStruct(
 ) { 
     let struct = EEGStruct(tag,parentUser,parentStruct, assignProps);
     struct.structType = 'emg';
-    return struct;
+    return struct as types.EMGStruct;
 }
 
 
@@ -434,7 +434,7 @@ export function ProfileStruct(
 
     let struct = Struct('profile',props,parentUser,parentStruct);
     
-    return Object.assign(struct,assignProps);
+    return Object.assign(struct,assignProps) as types.ProfileStruct;
 
 }
 
@@ -461,7 +461,7 @@ export function AuthorizationStruct(
 
     let struct = Struct('authorization',props,parentUser,parentStruct);
 
-    return Object.assign(struct,assignProps);
+    return Object.assign(struct,assignProps) as types.AuthorizationStruct;
 
 }
 
@@ -483,7 +483,7 @@ export function GroupStruct(
 
     let struct = Struct('group',props,parentUser,parentStruct);
 
-    return Object.assign(struct,assignProps);
+    return Object.assign(struct,assignProps) as types.GroupStruct;
 }
 
 export function DataStruct(
@@ -503,7 +503,7 @@ export function DataStruct(
 
     let struct = Struct('dataInstance',props,parentUser,parentStruct);
 
-    return Object.assign(struct,assignProps);
+    return Object.assign(struct,assignProps) as types.DataStruct;
 }
 
 export function EventStruct(
@@ -526,7 +526,7 @@ export function EventStruct(
 
     let struct = Struct('event',props,parentUser,parentStruct);
 
-    return Object.assign(struct,assignProps);
+    return Object.assign(struct,assignProps) as types.EventStruct;
 
 }
 
@@ -551,7 +551,7 @@ export function ChatroomStruct(
 
     let struct = Struct('chatroom',props,parentUser,parentStruct);
 
-    return Object.assign(struct,assignProps);
+    return Object.assign(struct,assignProps) as types.ChatroomStruct;
 
 }
 
@@ -574,7 +574,7 @@ export function CommentStruct(
 
     let struct = Struct('comment',props,parentUser,parentStruct);
 
-    return Object.assign(struct,assignProps);
+    return Object.assign(struct,assignProps) as types.CommentStruct;
 
 }
 
@@ -592,7 +592,7 @@ export function NotificationStruct(
 
     let struct = Struct('notification',props,parentUser,parentStruct);
 
-    return Object.assign(struct,assignProps);
+    return Object.assign(struct,assignProps) as types.NotificationStruct;
 
 }
 
@@ -613,7 +613,7 @@ export function ScheduleStruct(
 
     let struct = Struct('schedule',props,parentUser,parentStruct);
 
-    return Object.assign(struct,assignProps);
+    return Object.assign(struct,assignProps) as types.ScheduleStruct;
 
 }
 
@@ -633,7 +633,7 @@ export function DateStruct(
 
     let struct = Struct('date',props,parentUser,parentStruct);
 
-    return Object.assign(struct,assignProps);
+    return Object.assign(struct,assignProps) as types.DateStruct;
 
 }
 

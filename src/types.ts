@@ -1,3 +1,4 @@
+
 export type ArbitraryObject = {[x:string|number]: any}
 
 export type Struct = {
@@ -22,16 +23,15 @@ export type Data = {
 }
 
 export type DataStruct = {
-    tag:string|number|undefined,
     title:      string|undefined,
     author:     string|undefined,
     expires:    boolean|number|string, //date of expiration, or never. Data that never expires should generally only be patient controlled stuff so its transparent
     type:       string, //graph, file, table, fitbit_hr, fitbit_diet, etc.
-    data:       Data[] //arrays, objects, links, API refrences, pdfs, csvs, xls, etc.
+    data:       Data[], //arrays, objects, links, API refrences, pdfs, csvs, xls, etc.
+    tag?:string|number|undefined
 } & Struct
 
 export type EventStruct = {
-    tag:string|number|undefined,
     event:string, //event type e.g. relapse, hospitalization
     author:string,
     startTime:string,  //event began
@@ -40,10 +40,10 @@ export type EventStruct = {
     notes:string, //additional details
     attachments:Data|string|number[], //can be data or struct Ids
     users:string[], //users to be informed (i.e. peers)
+    tag?:string|number|undefined
 } & Struct
 
 export type ChatroomStruct = {
-    tag:string|number|undefined,
     message:string,
     topic:string,
     author:string,
@@ -52,42 +52,42 @@ export type ChatroomStruct = {
     replies: string[], //first level reply comment struct Ids
     users: string[], //user Ids
     audioChatActive: boolean,
-    videoChatActive: boolean
+    videoChatActive: boolean,
+    tag?:string|number|undefined
 } & Struct
 
 export type CommentStruct = {
-    tag:string|number|undefined,
     author:string,
     replyTo:string,
     attachments: Data|string|number[],
     replies: string[], //struct Ids
     users: string[], //user Ids
+    tag?:string|number|undefined
 } & Struct
 
 export type NotificationStruct = {
-    tag:string|number|undefined,
     note:string,
-    parentUserId:string
+    parentUserId:string,
+    tag?:string|number|undefined
 } & Struct
 
 export type ScheduleStruct = {
-    tag:string|number|undefined,
     title:string,
     author:string,
     attachments: Data|string|number[],
-    dates: string[]
+    dates: string[],
+    tag?:string|number|undefined
 } & Struct
 
 export type DateStruct = {
-    tag:string|number|undefined,
     timeSet:string|number,
     notes:string,
     recurs:number|string|boolean,
     attachments: Data|string|number[],
+    tag?:string|number|undefined
 } & Struct
 
 export type ProfileStruct = {
-    tag:string|number|undefined,
     username:  string,
     name?:      string, 
     firstName?: string, 
@@ -97,11 +97,11 @@ export type ProfileStruct = {
     birthday?:  string,
     userRoles?: string[],
     type?:      string,
-    id?:        string|number 
+    id?:        string|number,
+    tag?:string|number|undefined 
 } & Struct
 
 export type AuthorizationStruct = {
-    tag:string|number|undefined,
     authorizedId:     string,
     authorizedName:   string,
     authorizerId:     string,
@@ -112,18 +112,19 @@ export type AuthorizationStruct = {
     groups:           string[],
     status:           "PENDING"|"OKAY",
     expires:          string|boolean, 
-    associatedAuthId: string|number //other authorization id belonging to other user
+    associatedAuthId: string|number, //other authorization id belonging to other user
+    tag?:string|number|undefined
 } & Struct
 
 
 export type GroupStruct = {
-    tag:string|number|undefined,
     name:string,
     details:string,
     admins:string|number[], //user ids
     peers:string|number[],  //user ids
     clients:string|number[], 
-    users:string|number[] //all users (for notifying)   
+    users:string|number[], //all users (for notifying)   
+    tag?:string|number|undefined
 } & Struct;
 
 
@@ -143,7 +144,6 @@ export type FrequencyBandsStruct = {
 }
 
 export type EEGStruct = {
-    tag:string|number|undefined, 
     position:{x:number,y:number,z:number},
     count:number,
     times:number[], 
@@ -154,11 +154,11 @@ export type EEGStruct = {
     ffts:[][], 
     slices:FrequencyBandsStruct, 
     means:FrequencyBandsStruct,
-    startTime:number|string
+    startTime:number|string,
+    tag?:string|number|undefined
 } & Struct
 
 export type CoherenceStruct = {
-    tag: string,
     x0: number,
     y0: number,
     z0: number,
@@ -170,11 +170,11 @@ export type CoherenceStruct = {
     ffts:[][],
     slices:FrequencyBandsStruct,
     means: FrequencyBandsStruct,  // counter value when this struct was last read from (for using get functions)
-    startTime:number|string
+    startTime:number|string,
+    tag?:string|number|undefined
 } & Struct
 
 export type FNIRSStruct = {
-    tag:string|number|undefined,
     position:{x:number,y:number,z:number},
     count:number,
     times:number[],
@@ -199,29 +199,41 @@ export type FNIRSStruct = {
         val_dists2:any[],
         peak_dists2:any[]
     },
-    startTime:number|string
+    startTime:number|string,
+    tag?:string|number|undefined
 } & Struct
 
 export type IMUStruct = {
-    tag:string|number|undefined,
     Ax:number[],
     Ay:number[],
     Az:number[],
     Gx:number[],
     Gy:number[],
     Gz:number[],
-    startTime:number|string
+    startTime:number|string,
+    tag?:string|number|undefined
+} & Struct
+
+export type EyeTrackerStruct = {
+        count:number, 
+        times:number[], 
+        x:number[], 
+        y:number[], 
+        smax:number[],  //simple moving averages
+        smay:number[], 
+        startTime:number|string,
+        tag?:string|number|undefined
 } & Struct
 
 export type ECGStruct = {
-    tag:string|number|undefined,
     count:number,
     times:number[],
     raw:number[],
     filtered:number[],
     bpm:number[],
     hrv:number[],
-    startTime:number|string
+    startTime:number|string,
+    tag?:string|number|undefined
 } & Struct
 
 export type PPGStruct = FNIRSStruct;
