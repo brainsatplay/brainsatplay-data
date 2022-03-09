@@ -106,10 +106,10 @@ export type AuthorizationStruct = {
     authorizedName:   string,
     authorizerId:     string,
     authorizerName:   string,
-    authorizations:   string[], //authorization types e.g. what types of data the person has access to
-    structs:          string|number[], //specific structs, contains structrefs
-    excluded:         string|number[], 
-    groups:           string[],
+    authorizations:   {}, //authorization types e.g. what types of data the person has access to
+    structs:          {}, //specific structs, contains structrefs
+    excluded:         {}, 
+    groups:           {},
     status:           "PENDING"|"OKAY",
     expires:          string|boolean, 
     associatedAuthId: string|number, //other authorization id belonging to other user
@@ -120,10 +120,10 @@ export type AuthorizationStruct = {
 export type GroupStruct = {
     name:string,
     details:string,
-    admins:string|number[], //user ids
-    peers:string|number[],  //user ids
-    clients:string|number[], 
-    users:string|number[], //all users (for notifying)   
+    admins:{}, //user ids
+    peers:{},  //user ids
+    clients:{}, 
+    users:{}, //all users (for notifying)   
     tag?:string|number|undefined
 } & Struct;
 

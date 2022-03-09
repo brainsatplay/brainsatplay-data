@@ -450,10 +450,10 @@ export function AuthorizationStruct(
         authorizedName:   '',
         authorizerId:     '',
         authorizerName:   '',
-        authorizations:   new Array(), //authorization types e.g. what types of data the person has access to
-        structs:          new Array(), //specific structs, contains structrefs
-        excluded:         new Array(), 
-        groups:           new Array(),
+        authorizations:   {}, //authorization types e.g. what types of data the person has access to
+        structs:          {}, //specific structs, contains structrefs
+        excluded:         {}, 
+        groups:           {},
         status:           'PENDING', //PENDING for non-approved auths
         expires:          false, 
         associatedAuthId: '' //other authorization id belonging to other user
@@ -475,10 +475,10 @@ export function GroupStruct(
         tag:tag,
         name:"",
         details:"",
-        admins:new Array(),
-        peers:new Array(),
-        clients:new Array(), 
-        users:new Array() //all users (for notifying)   
+        admins:{}, // can add/remove peers/clients.
+        peers:{}, // gets access to clients
+        clients:{}, // //gives access to peers
+        users:{} //all users (for notifying)   
     };
 
     let struct = Struct('group',props,parentUser,parentStruct);
