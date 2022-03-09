@@ -428,7 +428,7 @@ export function ProfileStruct(
         sex:       '',
         birthday:  '',
         type:      '',
-        userRoles: [],
+        userRoles: {},
         id:        '' //references the token id which is behind a collection permission
     };
 
@@ -521,7 +521,7 @@ export function EventStruct(
         grade:0,  //severity
         notes:"", //additional details
         attachments:new Array(),
-        users:new Array(), //users to be informed (i.e. peers)
+        users:{}, //users to be informed (i.e. peers)
     };
 
     let struct = Struct('event',props,parentUser,parentStruct);
@@ -544,7 +544,7 @@ export function ChatroomStruct(
         attachments: new Array(),
         comments: new Array(),
         replies: new Array(),
-        users: new Array(),
+        users: {},
         audioChatActive: false,
         videoChatActive: false
     };
@@ -568,7 +568,7 @@ export function CommentStruct(
         message:'',
         rating:0,
         replies: new Array(),
-        users: new Array(),
+        users: {},
         attachments: new Array()
     };
 

@@ -8,7 +8,6 @@ export type Struct = {
     timestamp?:string|number,
     ownerId?:string|number,
     parent?:{structType:string,_id:string|number}
-    data?: [] // For DataInstance Strucxt
 }
 
 export type DataTypes = 'byTime' | 'notes' | 'events' | 'sleep' | 'food' | 'hr' | 'ppg' | 'hrv' | 'ecg' | 'emg' | 'eeg' | 'fnirs'
@@ -39,7 +38,7 @@ export type EventStruct = {
     grade:string|number,  //severity
     notes:string, //additional details
     attachments:Data|string|number[], //can be data or struct Ids
-    users:string[], //users to be informed (i.e. peers)
+    users:{}, //users to be informed (i.e. peers)
     tag?:string|number|undefined
 } & Struct
 
@@ -50,7 +49,7 @@ export type ChatroomStruct = {
     attachments: Data|string|number[],
     comments: string[], //all comment struct Ids
     replies: string[], //first level reply comment struct Ids
-    users: string[], //user Ids
+    users: {}, //user Ids
     audioChatActive: boolean,
     videoChatActive: boolean,
     tag?:string|number|undefined
@@ -61,7 +60,7 @@ export type CommentStruct = {
     replyTo:string,
     attachments: Data|string|number[],
     replies: string[], //struct Ids
-    users: string[], //user Ids
+    users: {}, //user Ids
     tag?:string|number|undefined
 } & Struct
 
@@ -95,7 +94,7 @@ export type ProfileStruct = {
     email?:     string, 
     sex?:       string,
     birthday?:  string,
-    userRoles?: string[],
+    userRoles?: {},
     type?:      string,
     id?:        string|number,
     tag?:string|number|undefined 
