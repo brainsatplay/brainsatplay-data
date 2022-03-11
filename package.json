@@ -1,6 +1,6 @@
 {
   "name": "brainsatplay-data",
-  "version": "0.0.37",
+  "version": "0.0.39",
   "description": "Data Structures plus some useful classes for data manipulation",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",

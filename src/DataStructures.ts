@@ -425,10 +425,12 @@ export function ProfileStruct(
         firstName: '', 
         lastName:  '', 
         email:     '', 
+        phone:     '',
         sex:       '',
         birthday:  '',
         type:      '',
         userRoles: {},
+        socials:   {},
         id:        '' //references the token id which is behind a collection permission
     };
 

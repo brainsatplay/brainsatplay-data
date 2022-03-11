@@ -92,9 +92,11 @@ export type ProfileStruct = {
     firstName?: string, 
     lastName?:  string, 
     email?:     string, 
+    phone?:     string,
     sex?:       string,
     birthday?:  string,
     userRoles?: {},
+    socials?:   {},
     type?:      string,
     id?:        string|number,
     tag?:string|number|undefined 
