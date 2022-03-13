@@ -431,6 +431,7 @@ export function ProfileStruct(
         type:      '',
         userRoles: {},
         socials:   {},
+        data:      {}, //arbitrary stuff
         id:        '' //references the token id which is behind a collection permission
     };
 

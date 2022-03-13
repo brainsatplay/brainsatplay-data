@@ -97,6 +97,7 @@ export type ProfileStruct = {
     birthday?:  string,
     userRoles?: {},
     socials?:   {},
+    data?:      {},
     type?:      string,
     id?:        string|number,
     tag?:string|number|undefined 
