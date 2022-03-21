@@ -10,9 +10,9 @@ export type Struct = {
     parent?:{structType:string,_id:string|number}
 }
 
-export type DataTypes = 'byTime' | 'notes' | 'events' | 'sleep' | 'food' | 'hr' | 'ppg' | 'hrv' | 'ecg' | 'emg' | 'eeg' | 'fnirs'
-export type StructTypes = LooseStructTypes | DataTypes | 'dataInstance' | 'struct' | string
-export type LooseStructTypes = 'coherence' | 'imu' | 'eyetracker' | 'profile' | 'authorization' | 'group' | 'event' | 'chatroom' | 'comment' | 'notification' | 'schedule' | 'date'
+export type DataTypes = 'byTime' | 'notes' | 'events' | 'sleep' | 'food' | 'rx' | 'hr' | 'ppg' | 'hrv' | 'ecg' | 'emg' | 'eeg' | 'fnirs' | string | number
+export type StructTypes = LooseStructTypes | DataTypes | 'dataInstance' | 'struct' | string | number
+export type LooseStructTypes = 'coherence' | 'imu' | 'eyetracker' | 'profile' | 'authorization' | 'group' | 'event' | 'chatroom' | 'comment' | 'notification' | 'schedule' | 'date' | string | number
 
 
 export type Data = {

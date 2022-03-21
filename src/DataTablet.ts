@@ -1,6 +1,5 @@
 import * as DS from './DataStructures'
-import { ArbitraryObject, Struct, DataTypes } from './types';
-
+import { ArbitraryObject, Struct, DataTypes, DataStruct } from './types';
 
 export class DataTablet {
 
@@ -12,25 +11,13 @@ export class DataTablet {
     workers: any;
     DS: any = DS;
     collections: Map<string, any> = new Map();
-    data: {
-        byTime:ArbitraryObject, //everything is arranged by time
-        notes:ArbitraryObject,
-        events:ArbitraryObject,
-        sleep:ArbitraryObject, //or everything is arranged by type (then by time)
-        food:ArbitraryObject,
-        hr:ArbitraryObject,
-        ppg:ArbitraryObject,
-        hrv: ArbitraryObject,
-        ecg:ArbitraryObject,
-        emg:ArbitraryObject,
-        eeg:ArbitraryObject,
-        fnirs:ArbitraryObject
-    } = {
-        byTime:{}, //everything is arranged by time
-        notes:{},
+    data:any = {
+        byTime:{}, //everything is indexed by time
+        notes:{}, //or everything is indexed by type, then by time
         events:{},
-        sleep:{}, //or everything is arranged by type (then by time)
+        sleep:{}, 
         food:{},
+        rx:{},
         hr:{},
         ppg:{},
         hrv:{},
@@ -101,15 +88,15 @@ export class DataTablet {
         return `${tag+Math.floor(Math.random()+Math.random()*Math.random()*10000000000000000)}`;
     }
 
-    setLocalData (structs: any[]) {
+    setLocalData (structs: (Partial<Struct>)[]|(Partial<Struct>)) {
 
-        let setInCollection = (s:any) => {
+        let setInCollection = (s:Partial<Struct>) => {
             let type = s.structType;
         
-            let collection = this.collections.get(type);
+            let collection = this.collections.get(type as string);
             if(!collection) {
                 collection = new Map();
-                this.collections.set(type,collection);
+                this.collections.set(type as string,collection);
             }
             collection.set(s._id,s);
             this.onCollectionSet(type,collection);
@@ -196,7 +183,7 @@ export class DataTablet {
         
     }
 
-    runSort(key:string,dataObj={},newdata=[],tablet=this) {
+    runSort(key:DataTypes,dataObj={},newdata=[],tablet=this) {
         let result:any;
         if(this.threaded === false) {
             let sort = this.getSort(key);
@@ -220,9 +207,9 @@ export class DataTablet {
         }
     }
 
-    getSort(key:string) {
+    getSort(key:DataTypes) {
         if(this.threaded === false) {
-            return this.dataSorts.get(key);
+            return this.dataSorts.get(key as string);
         } else if (this.threaded === true) {
             return this.workers.runWorkerFunction('getSort',[key],this.workerId,this.id);
         }
@@ -232,16 +219,36 @@ export class DataTablet {
         for(const prop in this.watches) {
             this.watches[prop].ondata(sorted, this.watches[prop].accum, this.watches[prop]);
             if(this.watches[prop].triggered) { //manual trigger function
-                this.ontrigger(this.watches[prop].accum);
+                this.watches[prop].ontrigger(this.watches[prop].accum);
                 this.watches[prop].triggered = false;
             }
         }
     }
 
-    ontrigger = (_:any) => {}
-
     //after the data is sorted these will trigger
-    setWatch(name:string,ondata=(sorted:any,accum:any,watchObj:any)=>{},ontrigger=(_:any)=>{}) {
+    //how this works:
+    /**
+     * - pass the sorted structure to the accumulator
+     * - ondata checks the data if it's relevant and keeps a record via the accumulator
+     * - if the accumlator trips, it sets watchObj.triggered = true which triggers ontrigger(accum).
+     * - ontrigger 
+     * 
+     */
+    setWatch(
+        name:string,
+        ondata=(sorted:any,accum:any,watchObj:any)=>{ 
+            accum[sorted.timestamp] = sorted; 
+            if(Object.keys(accum).length > 10) {
+                watchObj.triggered = true;
+            } 
+        },
+        ontrigger=(accum:any)=>{
+            console.log(accum); //e.g.
+            accum.alert = true;
+            //client.setLocalData([accum]);
+            //client.updateServerData([accum]);
+            accum = this.DS.Struct('alert'); //e.g. reset the accumulator
+        }) {
         this.watches[name] = {
             triggered:false, //set the trigger to true in ondata to fire ontrigger and reset the trigger
             accum:this.DS.Struct('alert'), //data accumulated for checking a trigger
@@ -275,16 +282,16 @@ export class DataTablet {
                 this.data.byTime[timestamp] = [struct];
             else this.data.byTime[timestamp].push(struct);
 
-            if(struct.structType === 'dataInstance' && struct.data) {
+            if(struct.structType === 'dataInstance' && (struct as DataStruct).data) {
                 //we should sort instanced fitbit data into timestamped bins with markers for different resolutions
                 //other data in dataInstance.data array will be like {dataType:'notes',data:'abcdefg'} 
-                struct.data.forEach(async (dat:any) => {
+                (struct as DataStruct).data.forEach(async (dat:any) => {
                     if(typeof dat === 'object' && !Array.isArray(dat)) {
                         let typ:DataTypes = dat.dataType;
                         dat.ownerId = struct.ownerId;
                         if(!dat.timestamp) dat.timestamp = timestamp;
                         if(typ) {
-                            let sorted = this.runSort(typ,dat, newdata as any,this);
+                            let sorted = this.runSort(typ, dat, newdata as any,this);
                             if(!sorted) { //generic
                                 if(!this.data[typ]) this.data[typ] = {};
     
