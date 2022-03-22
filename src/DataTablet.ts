@@ -190,20 +190,34 @@ export class DataTablet {
             if (sort) result = sort(dataObj,newdata,tablet);
             else return false;
         } else if (this.threaded === true) {
-            return this.workers.runWorkerFunction('runSort',[key,dataObj,newdata],this.workerId,this.id);
+            return this.workers.run('runSort',[key,dataObj,newdata],this.workerId,this.id);
         }
 
         return result
     }
 
-    setSort(key:string | string[],response=(data:any,newdata:any[]=[],tablet=this)=>{}) {
+    //how sorts work:
+    /**
+     * Unsorted data structs come in with a minimum 'structType' and 'timestamp' set of values.
+     * 
+     * If a sort key matches the structType or dataType (from a dataInstance struct.data array),
+     *  it can return a modified struct or push to the newdata array with a set of newly made structs. 
+     * Return undefined to process the input data by default structType/dataType and timestamp into the tablet, so you can do this 
+     *   plus split up additional structs or processed structs into each other. This is intentionally vague until we refine this idea into clearer hooks.
+     * The newdata array accumulates all of the data structs supplied on a sort pass which gets sent to this.onSorted() at the end of the sorting pass.
+     */
+
+    setSort(
+        key:string | string[],
+        response=(data:any,newdata:any[]=[],tablet=this)=>{}
+    ) {
         if(this.threaded === false) {
             if(Array.isArray(key))
                 key.forEach((k) => {this.dataSorts.set(k,response);});
             else
                 this.dataSorts.set(key,response);
         } else if (this.threaded === true) {
-            return this.workers.runWorkerFunction('setSort',[key,response.toString()],this.workerId,this.id);
+            return this.workers.run('setSort',[key,response.toString()],this.workerId,this.id);
         }
     }
 
@@ -211,14 +225,14 @@ export class DataTablet {
         if(this.threaded === false) {
             return this.dataSorts.get(key as string);
         } else if (this.threaded === true) {
-            return this.workers.runWorkerFunction('getSort',[key],this.workerId,this.id);
+            return this.workers.run('getSort',[key],this.workerId,this.id);
         }
     }
 
     checkWatches(sorted:ArbitraryObject={}) {
         for(const prop in this.watches) {
-            this.watches[prop].ondata(sorted, this.watches[prop].accum, this.watches[prop]);
-            if(this.watches[prop].triggered) { //manual trigger function
+            let triggered = this.watches[prop].ondata(sorted, this.watches[prop].accum, this.watches[prop].ownerId);
+            if(triggered) { //manual trigger function
                 this.watches[prop].ontrigger(this.watches[prop].accum);
                 this.watches[prop].triggered = false;
             }
@@ -228,30 +242,33 @@ export class DataTablet {
     //after the data is sorted these will trigger
     //how this works:
     /**
-     * - pass the sorted structure to the accumulator
+     * - pass the sorted structure to the accumulator object which is just an empty object you can do whatever with
      * - ondata checks the data if it's relevant and keeps a record via the accumulator
-     * - if the accumlator trips, it sets watchObj.triggered = true which triggers ontrigger(accum).
-     * - ontrigger 
-     * 
+     * - if the accumlator condition is satisfied, return true which triggers ontrigger(accum), else return a falsey value
+     * - ontrigger function then is passed the accumulator object to do whatever with, 
+     *      e.g. supply it to an 'alert' struct, set alert:true, and data:accum, and update the server to notify any connected peers.
      */
+
     setWatch(
         name:string,
-        ondata=(sorted:any,accum:any,watchObj:any)=>{ 
-            accum[sorted.timestamp] = sorted; 
-            if(Object.keys(accum).length > 10) {
-                watchObj.triggered = true;
+        ownerId:string|undefined,
+        ondata=(sorted:any,accum:any, ownerId:string)=>{ 
+            if(sorted.ownerId === ownerId)
+            accum.data[sorted._id] = sorted; 
+            if(Object.keys(accum.data).length > 10) {
+                return true; //return true if some condition is met
             } 
+            else return false; //else return falsey value (false, null, undefined)
         },
         ontrigger=(accum:any)=>{
             console.log(accum); //e.g.
-            accum.alert = true;
-            //client.setLocalData([accum]);
-            //client.updateServerData([accum]);
-            accum = this.DS.Struct('alert'); //e.g. reset the accumulator
+            let alert = DS.Struct('alert',{alert:true, data:accum},{_id:accum[Object.keys(accum)[0]].ownerId});
+            //client.setData(alert);
+            accum = {}; //e.g. reset the accumulator
         }) {
         this.watches[name] = {
-            triggered:false, //set the trigger to true in ondata to fire ontrigger and reset the trigger
-            accum:this.DS.Struct('alert'), //data accumulated for checking a trigger
+            accum:{}, //data accumulated for checking a trigger
+            ownerId:ownerId, //particular owner id to watch for?
             ondata,
             ontrigger
         };
@@ -263,8 +280,8 @@ export class DataTablet {
     }
 
     async sortStructsIntoTable(datastructs:Struct[]=[]) {
-        //sort by timestamp 
-        let ascending = function(a:any,b:any) { return a.timestamp - b.timestamp; }
+        //sort by timestamp, datastructs must be objects with a timestamp key to be sortable
+        let ascending = function(a:any,b:any) { if(a.timestamp && b.timestamp) return a.timestamp - b.timestamp; }
         /**
          * let descending = function(a,b) { return b.timestamp-a.timestamp };
          */
@@ -353,7 +370,7 @@ export class DataTablet {
     getDataByTimestamp(timestamp: number, ownerId: string) {
         if(this.threaded === true) {
             //if running threads this needs to be awaited or do .then(res)
-            return this.workers.runWorkerFunction('getDataByTimestamp',[timestamp,ownerId],this.workerId,this.id);
+            return this.workers.run('getDataByTimestamp',[timestamp,ownerId],this.workerId,this.id);
         }
 
         let result = this.data.byTime[timestamp];
@@ -364,7 +381,7 @@ export class DataTablet {
     getDataByTimeRange(begin:number,end:number,type:DataTypes,ownerId:string) {
         if(this.threaded === true) {
             //if running threads this needs to be awaited or do .then(res)
-            return this.workers.runWorkerFunction('getDataByTimeRange',[begin,end,type,ownerId],this.workerId,this.id);
+            return this.workers.run('getDataByTimeRange',[begin,end,type,ownerId],this.workerId,this.id);
         }
 
         let result:ArbitraryObject = {};
