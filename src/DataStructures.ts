@@ -5,9 +5,9 @@ import * as types from './types'
 
 /* Barebones struct format with basic metadata, append any additional props */
 export function Struct(
-    structType:types.StructTypes='struct', 
+    structType:string|number|undefined='struct', 
     assignProps:types.ArbitraryObject={},
-    parentUser:types.ArbitraryObject={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) {
     
@@ -18,7 +18,7 @@ export function Struct(
     let struct: types.Struct = {
         _id: randomId(structType+'defaultId'),   //random id associated for unique identification, used for lookup and indexing
         structType: structType,     //this is how you will look it up by type in the server
-        ownerId: parentUser?._id,     //owner user
+        ownerId: (parentUser as types.ProfileStruct)?._id,     //owner user
         timestamp: Date.now(),      //date of creation
         parent: {structType:parentStruct?.structType,_id:parentStruct?._id}, //parent struct it's associated with (e.g. if it needs to spawn with it)
     }
@@ -161,7 +161,7 @@ export function FrequencyBandsStruct(
 export function EEGStruct(
     tag:string|number|undefined = '',
     assignProps:types.ArbitraryObject={},
-    parentUser:types.ArbitraryObject={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) {
     let bands = FrequencyBandsStruct();
@@ -190,7 +190,7 @@ export function EEGStruct(
 export function CoherenceStruct(
     coords={0:EEGStruct('FP1'), 1:EEGStruct('FP2')},
     assignProps:types.ArbitraryObject={},
-    parentUser:types.ArbitraryObject={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) {
     let bands = FrequencyBandsStruct();
@@ -219,7 +219,7 @@ export function CoherenceStruct(
 export function CoherenceMap(
     opts:{channelDicts:any[], taggedOnly?:boolean}={channelDicts:[{ch:0, tag:'FP1', analyze: false},{ch:1,tag:'FP2', analyze: false}],taggedOnly:true}, 
     _:types.ArbitraryObject={},
-    parentUser:types.ArbitraryObject={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) {
     var cmap = [];
@@ -250,7 +250,7 @@ export function CoherenceMap(
 export function FNIRSStruct(
     tag:string|number|undefined = '',
     assignProps:types.ArbitraryObject={},
-    parentUser:types.ArbitraryObject={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) {
     let props = {
@@ -295,7 +295,7 @@ export function FNIRSStruct(
 export function IMUStruct(
     tag:string|number|undefined = '',
     assignProps:types.ArbitraryObject={},
-    parentUser:types.ArbitraryObject={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) {
     let props = {
@@ -320,7 +320,7 @@ export function IMUStruct(
 export function EyeTrackerStruct(
     tag:string|number|undefined = '',
     assignProps:types.ArbitraryObject={},
-    parentUser:types.ArbitraryObject={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) {
 
@@ -345,7 +345,7 @@ export function EyeTrackerStruct(
 export function ECGStruct(
     tag:string|number|undefined = '',
     assignProps:types.ArbitraryObject={},
-    parentUser:types.ArbitraryObject={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) {
 
@@ -378,7 +378,7 @@ export function EDAStruct(
 export function PPGStruct(
     tag:string|number|undefined = '',
     assignProps:types.ArbitraryObject={},
-    parentUser:types.ArbitraryObject={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) { 
     let struct = FNIRSStruct(tag,parentUser,parentStruct, assignProps);
@@ -389,7 +389,7 @@ export function PPGStruct(
 export function HRVStruct(
     tag:string|number|undefined = '',
     assignProps:types.ArbitraryObject={},
-    parentUser:types.ArbitraryObject={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) { 
     let struct = ECGStruct(tag,parentUser,parentStruct,assignProps);
@@ -400,7 +400,7 @@ export function HRVStruct(
 export function EMGStruct(
     tag:string|number|undefined = '',
     assignProps:types.ArbitraryObject={},
-    parentUser:types.ArbitraryObject={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) { 
     let struct = EEGStruct(tag,parentUser,parentStruct, assignProps);
@@ -414,7 +414,7 @@ export function EMGStruct(
 export function ProfileStruct(
     tag:string|number|undefined = '',
     assignProps:types.ArbitraryObject={},
-    parentUser:types.ArbitraryObject={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct:types.ArbitraryObject={structType:'struct',_id:''} 
 ) {
 
@@ -444,7 +444,7 @@ export function ProfileStruct(
 export function AuthorizationStruct(
     tag:string|number|undefined = '',
     assignProps={},
-    parentUser={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct={structType:'struct',_id:''} 
 ) {
     let props = {
@@ -471,7 +471,7 @@ export function AuthorizationStruct(
 export function GroupStruct(
     tag:string|number|undefined = '',
     assignProps={},
-    parentUser={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct={structType:'struct',_id:''} 
 ) {
     let props = {
@@ -489,10 +489,18 @@ export function GroupStruct(
     return Object.assign(struct,assignProps) as types.GroupStruct;
 }
 
+export function Data(type:string,data:any[]) {
+    return {
+        type,
+        data,
+        timestamp:Date.now()
+    };
+}
+
 export function DataStruct(
     tag:string|number|undefined = '',
     assignProps={},
-    parentUser={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct={structType:'struct',_id:''} 
 ) {
     let props = {
@@ -512,7 +520,7 @@ export function DataStruct(
 export function EventStruct(
     tag:string|number|undefined = '',
     assignProps={},
-    parentUser={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct={structType:'struct',_id:''} 
 ) {
     let props = {
@@ -536,7 +544,7 @@ export function EventStruct(
 export function ChatroomStruct(
     tag:string|number|undefined = '',
     assignProps={},
-    parentUser={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct={structType:'struct',_id:''} 
 ) {
     let props = {
@@ -561,7 +569,7 @@ export function ChatroomStruct(
 export function CommentStruct(
     tag:string|number|undefined = '',
     assignProps={},
-    parentUser={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct={structType:'struct',_id:''} 
 ) {
     let props = {
@@ -584,7 +592,7 @@ export function CommentStruct(
 export function NotificationStruct(
     tag:string|number|undefined = '',
     assignProps={},
-    parentUser={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct={structType:'struct',_id:''} 
 ) {
     let props = {
@@ -603,7 +611,7 @@ export function NotificationStruct(
 export function ScheduleStruct(
     tag:string|number|undefined = '',
     assignProps={},
-    parentUser={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct={structType:'struct',_id:''} 
 ) {
     let props = {
@@ -623,7 +631,7 @@ export function ScheduleStruct(
 export function DateStruct(
     tag:string|number|undefined = '',
     assignProps={},
-    parentUser={_id:''},
+    parentUser:Partial<types.ProfileStruct>|{_id:string}={_id:''},
     parentStruct={structType:'struct',_id:''} 
 ) {
     let props = {
