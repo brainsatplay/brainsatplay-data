@@ -3,8 +3,7 @@ export type ArbitraryObject = {[x:string|number]: any}
 
 export type Struct = {
     _id:string,
-    id?:string,
-    structType:StructTypes,
+    structType?:string|number|undefined,
     timestamp?:string|number,
     ownerId?:string|number,
     parent?:{structType:string,_id:string|number}
