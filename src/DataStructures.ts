@@ -489,7 +489,7 @@ export function GroupStruct(
     return Object.assign(struct,assignProps) as types.GroupStruct;
 }
 
-export function Data(type:string,data:any[]) {
+export function Data(type:string,data:any) {
     return {
         type,
         data,
@@ -512,7 +512,7 @@ export function DataStruct(
         data:       new Array() //arrays, objects, links, API refrences, pdfs, csvs, xls, etc.
     };
 
-    let struct = Struct('dataInstance',props,parentUser,parentStruct);
+    let struct = Struct('data',props,parentUser,parentStruct);
 
     return Object.assign(struct,assignProps) as types.DataStruct;
 }

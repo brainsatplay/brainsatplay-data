@@ -200,7 +200,7 @@ export class DataTablet {
     /**
      * Unsorted data structs come in with a minimum 'structType' and 'timestamp' set of values.
      * 
-     * If a sort key matches the structType or dataType (from a dataInstance struct.data array),
+     * If a sort key matches the structType or dataType (from a data struct.data array),
      *  it can return a modified struct or push to the newdata array with a set of newly made structs. 
      * Return undefined to process the input data by default structType/dataType and timestamp into the tablet, so you can do this 
      *   plus split up additional structs or processed structs into each other. This is intentionally vague until we refine this idea into clearer hooks.
@@ -299,9 +299,9 @@ export class DataTablet {
                 this.data.byTime[timestamp] = [struct];
             else this.data.byTime[timestamp].push(struct);
 
-            if(struct.structType === 'dataInstance' && (struct as DataStruct).data) {
+            if(struct.structType === 'data' && (struct as DataStruct).data) {
                 //we should sort instanced fitbit data into timestamped bins with markers for different resolutions
-                //other data in dataInstance.data array will be like {dataType:'notes',data:'abcdefg'} 
+                //other data in data.data array will be like {dataType:'notes',data:'abcdefg'} 
                 (struct as DataStruct).data.forEach(async (dat:any) => {
                     if(typeof dat === 'object' && !Array.isArray(dat)) {
                         let typ:DataTypes = dat.dataType;
@@ -337,7 +337,7 @@ export class DataTablet {
             else {
                 let sorted = this.runSort(struct.structType,struct,newdata as any,this);
                 if(!sorted) { //generic
-                    let typ = struct.structType as DataTypes; // TODO: Reconcile that dataInstance could be the type...
+                    let typ = struct.structType as DataTypes; // TODO: Reconcile that data could be the type...
                     if(!this.data[typ]) this.data[typ] = {};
                     if(!this.data[typ][timestamp])
                         this.data[typ][timestamp] = [struct];

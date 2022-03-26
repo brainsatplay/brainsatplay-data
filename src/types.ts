@@ -10,7 +10,7 @@ export type Struct = {
 }
 
 export type DataTypes = 'byTime' | 'notes' | 'events' | 'sleep' | 'food' | 'rx' | 'hr' | 'ppg' | 'hrv' | 'ecg' | 'emg' | 'eeg' | 'fnirs' | string | number | undefined
-export type StructTypes = LooseStructTypes | DataTypes | 'dataInstance' | 'struct' | string | number | undefined
+export type StructTypes = LooseStructTypes | DataTypes | 'data' | 'struct' | string | number | undefined
 export type LooseStructTypes = 'coherence' | 'imu' | 'eyetracker' | 'profile' | 'authorization' | 'group' | 'event' | 'chatroom' | 'comment' | 'notification' | 'schedule' | 'date' | string | number | undefined
 
 
